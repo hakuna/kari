@@ -30,6 +30,7 @@ module Saloon
 
       def ensure_schema_set
         return unless @__primed # connection is still in initialization
+        return if Rails.env.test?
 
         if Saloon.current_schema.blank? && Saloon.configuration.raise_if_schema_not_set
           raise SchemaNotSpecified.new("Error: No schema set in current thread!")
