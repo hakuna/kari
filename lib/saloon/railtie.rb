@@ -18,6 +18,13 @@ module Saloon
       ActiveRecord::ConnectionAdapters::PostgreSQLAdapter.prepend(Saloon::Extensions::PostgreSQLAdapterExtension)
       ActiveRecord::FutureResult.prepend(Saloon::Extensions::FutureResultExtension)
 
+      # tell sidekiq to serialize saloon data for background jobs (if sidekiq is around)
+      begin
+        require "sidekiq/middleware/current_attributes"
+        Sidekiq::CurrentAttributes.persist(Saloon::Current)
+      rescue LoadError
+      end
+
       # explicitly direct global models to default schema
       Saloon.configuration.global_models.each do |global_model|
         klass = global_model.constantize
