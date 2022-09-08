@@ -29,13 +29,19 @@ module Saloon
 
     def process(schema, &block)
       raise "Please supply block" unless block_given?
-      old_schema = current.schema
-      block.call
-      current.schema = old_schema
+      old_schema = current_schema
+      self.current_schema = schema
+      value = block.call
+      self.current_schema = old_schema
+      value
     end
 
-    def switch!(schema)
-      current.schema = schema
+    def current_schema=(new_schema)
+      Current.schema = new_schema
+    end
+
+    def current_schema
+      Current.schema
     end
 
     private

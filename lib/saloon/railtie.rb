@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require_relative "extensions/postgresql_adapter_extension"
+require_relative "extensions/future_result_extension"
 
 require "active_record/connection_adapters/postgresql_adapter"
 
@@ -11,21 +12,11 @@ module Saloon
     config.saloon.global_models = []
     config.saloon.global_schema = 'public'
     config.saloon.schema_names = []
+    config.saloon.raise_if_schema_not_set = true
 
     config.to_prepare do
-      # monkey patch
-      # module ::ActiveRecord
-      #   class FutureResult
-      #     def schedule!(session)
-      #       @kwargs[:schema] = Current.tenant
-
-      #       @session = session
-      #       @pool.schedule_query(self)
-      #     end
-      #   end
-      # end
-
       ActiveRecord::ConnectionAdapters::PostgreSQLAdapter.prepend(Saloon::Extensions::PostgreSQLAdapterExtension)
+      ActiveRecord::FutureResult.prepend(Saloon::Extensions::FutureResultExtension)
 
       # explicitly direct global models to default schema
       Saloon.configuration.global_models.each do |global_model|
