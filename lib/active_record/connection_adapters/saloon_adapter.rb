@@ -44,7 +44,7 @@ module ActiveRecord
       private
 
       def saloon_switch_to_schema(schema = nil, &block)
-        schema ||= saloon_determine_schema
+        schema ||= Saloon.current.schema
         p "We are switching #{schema} #{Thread.current}"
 
         if @_saloon_connection_schema != schema
@@ -59,11 +59,6 @@ module ActiveRecord
         end
 
         block.call
-      end
-
-      def saloon_determine_schema
-        current_schema = Saloon.configuration.current_schema
-        current_schema.respond_to?(:call) ? current_schema.call  : current_schema
       end
     end
   end

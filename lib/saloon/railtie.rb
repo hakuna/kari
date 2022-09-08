@@ -6,16 +6,13 @@ module Saloon
 
     config.saloon.global_models = []
     config.saloon.global_schema = 'public'
-
     config.saloon.schema_names = []
-    config.saloon.current_schema = nil
 
     config.to_prepare do
       # monkey patch
       module ::ActiveRecord
         class FutureResult
           def schedule!(session)
-            p 'SCHEDULE'
             @kwargs[:schema] = Current.tenant
 
             @session = session
