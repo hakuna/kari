@@ -13,6 +13,7 @@ module Saloon
     config.saloon.global_schema = 'public'
     config.saloon.schema_names = []
     config.saloon.raise_if_schema_not_set = true
+    config.saloon.seed_after_create = false
 
     config.to_prepare do
       ActiveRecord::ConnectionAdapters::PostgreSQLAdapter.prepend(Saloon::Extensions::PostgreSQLAdapterExtension)

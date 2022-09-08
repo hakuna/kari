@@ -44,6 +44,32 @@ module Saloon
       Current.schema
     end
 
+    def schema_exists?(schema)
+      connection.schema_exists?(schema)
+    end
+
+    def import_global_schema(schema)
+      process(schema) do
+        load Rails.root.join("db/schema.rb")
+      end
+    end
+
+    def seed_schema(schema)
+      process(schema) do
+        load Rails.root.join("db/seeds.rb")
+      end
+    end
+
+    def create_schema(schema)
+      connection.create_schema(schema)
+      import_global_schema(schema)
+      seed_schema(schema) if Saloon.configuration.seed_after_create
+    end
+
+    def drop_schema(schema)
+      connection.drop_schema(schema)
+    end
+
     private
 
     def schema_names
