@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'active_record/connection_adapters/postgresql_adapter'
 
 module ActiveRecord
@@ -32,17 +34,18 @@ module ActiveRecord
         end
       end
 
-      def exec_query(*args)
-        saloon_switch_to_schema do
-          super
+      def exec_query(sql, name = "SQL", binds = [], prepare: false, async: false, schema: nil)
+        p [:schema, schema]
+        saloon_switch_to_schema(schema) do
+          super(sql, name, binds, prepare: prepare, async: async)
         end
       end
 
       private
 
-      def saloon_switch_to_schema(&block)
-        schema = saloon_determine_schema
-        raise SchemaNotSpecified if schema.blank?
+      def saloon_switch_to_schema(schema = nil, &block)
+        schema ||= saloon_determine_schema
+        p "We are switching #{schema} #{Thread.current}"
 
         if @_saloon_connection_schema != schema
           # set first since schema search path setter does execute("SET search_path")...
@@ -59,7 +62,7 @@ module ActiveRecord
       end
 
       def saloon_determine_schema
-        current_schema = Rails.application.config.saloon.current_schema
+        current_schema = Saloon.configuration.current_schema
         current_schema.respond_to?(:call) ? current_schema.call  : current_schema
       end
     end
