@@ -3,34 +3,24 @@
 BEFORE = %w[db:drop].freeze
 AFTER = %w[db:migrate db:create db:seed db:rollback db:migrate:up db:migrate:down].freeze
 
-Rake::Task.tasks.each do |task|
-  next unless task.scope.path == "db"
-
-  task.enhance(["kari:init"])
-end
-
-def inserted_task_name(task_name)
-  "kari:#{task_name.split(":", 2).last}"
+def kari_task_name(task_name)
+  sub_task_name = task_name.split(":", 2).last
+  "kari:#{sub_task_name}"
 end
 
 BEFORE.each do |task_name|
   task = Rake::Task[task_name]
-  task.enhance([inserted_task_name(task_name)])
+  task.enhance([kari_task_name(task_name)])
 end
 
 AFTER.each do |task_name|
   task = Rake::Task[task_name]
   task.enhance do
-    Rake::Task[inserted_task_name(task_name)].invoke
+    Rake::Task[kari_task_name(task_name)].invoke
   end
 end
 
 namespace :kari do
-  desc "Initialize"
-  task :init do
-    Kari.current_schema = Kari.configuration.global_schema
-  end
-
   desc "Create all schemas"
   task :create do
     Kari.each_schema do |schema|

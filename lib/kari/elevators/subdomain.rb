@@ -23,10 +23,14 @@ module Kari
         schema = if subdomain.present? && self.class.excluded_subdomains.exclude?(subdomain)
                    subdomain
                  else
-                   Kari.configuration.global_schema
+                   nil
                  end
 
-        Kari.process(schema) { @app.call(env) }
+        if schema
+          Kari.process(schema) { @app.call(env) }
+        else
+          @app.call(env)
+        end
       end
 
     end

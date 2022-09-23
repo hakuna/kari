@@ -12,7 +12,6 @@ module Kari
     config.kari.global_models = []
     config.kari.global_schema = "public"
     config.kari.schema_names = []
-    config.kari.raise_if_schema_not_set = true
     config.kari.seed_after_create = false
 
     config.to_prepare do
@@ -36,9 +35,6 @@ module Kari
         table_name = klass.table_name.split(".", 2).last
         klass.table_name = "#{Kari.configuration.global_schema}.#{table_name}"
       end
-
-      # set global schema as initial schema for console etc.
-      Kari.set_global_schema!
     end
 
     rake_tasks do

@@ -31,16 +31,14 @@ module Kari
         return unless @__primed # connection is still in initialization
         return if Rails.env.test?
 
-        if Kari.current_schema.blank? && Kari.configuration.raise_if_schema_not_set
-          raise Kari::SchemaNotSpecified, "Error: No schema set in current thread!"
-        end
+        schema = Kari.current_schema.presence || Kari.configuration.global_schema
 
-        if @__schema != Kari.current_schema
+        if @__schema != schema
           # set first since schema search path setter does execute("SET search_path")...
-          @__schema = Kari.current_schema
+          @__schema = schema
 
           # now set schema_search_path, which will set search_path
-          self.schema_search_path = "\"#{Kari.current_schema}\""
+          self.schema_search_path = "\"#{schema}\""
 
           # clear cache since we have to swap schemas
           clear_query_cache
