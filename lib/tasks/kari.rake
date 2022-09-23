@@ -5,11 +5,11 @@ AFTER = %w(db:migrate db:create db:seed db:rollback db:migrate:up db:migrate:dow
 
 Rake::Task.tasks.each do |task|
   next unless task.scope.path == 'db'
-  task.enhance(['saloon:init'])
+  task.enhance(['kari:init'])
 end
 
 def inserted_task_name(task_name)
-  "saloon:#{task_name.split(':', 2).last}"
+  "kari:#{task_name.split(':', 2).last}"
 end
 
 BEFORE.each do |task_name|
@@ -24,18 +24,18 @@ AFTER.each do |task_name|
   end
 end
 
-namespace :saloon do
+namespace :kari do
   desc 'Initialize'
   task :init do
-    Saloon.current_schema = Saloon.configuration.global_schema
+    Kari.current_schema = Kari.configuration.global_schema
   end
 
   desc 'Create all schemas'
   task :create do
-    Saloon.each_schema do |schema|
-      unless Saloon.schema_exists?(schema)
+    Kari.each_schema do |schema|
+      unless Kari.schema_exists?(schema)
         puts "Create schema #{schema}"
-        Saloon.create_schema(schema)
+        Kari.create_schema(schema)
       else
         puts "Schema #{schema} does already exist, cannot create"
       end
@@ -44,10 +44,10 @@ namespace :saloon do
 
   desc 'Drop all schemas'
   task :drop do
-    Saloon.each_schema do |schema|
-      if Saloon.schema_exists?(schema)
+    Kari.each_schema do |schema|
+      if Kari.schema_exists?(schema)
         puts "Drop schema #{schema}"
-        Saloon.drop_schema(schema)
+        Kari.drop_schema(schema)
       else
         puts "Schema #{schema} does not exist, cannot drop"
       end
@@ -56,10 +56,10 @@ namespace :saloon do
 
   desc 'Migrate all schemas'
   task :migrate do
-    Saloon.each_schema do |schema|
-      if Saloon.schema_exists?(schema)
+    Kari.each_schema do |schema|
+      if Kari.schema_exists?(schema)
         puts "Migrate schema #{schema}"
-        Saloon.process(schema) do
+        Kari.process(schema) do
           ActiveRecord::Tasks::DatabaseTasks.migrate
         end
       else
@@ -70,10 +70,10 @@ namespace :saloon do
 
   desc 'Seed all schemas'
   task :seed do
-    Saloon.each_schema do |schema|
-      if Saloon.schema_exists?(schema)
+    Kari.each_schema do |schema|
+      if Kari.schema_exists?(schema)
         puts "Seed schema #{schema}"
-        Saloon.seed_schema(schema)
+        Kari.seed_schema(schema)
       else
         puts "Schema #{schema} does not exist, cannot seed"
       end
@@ -84,10 +84,10 @@ namespace :saloon do
   task :rollback do
     step = ENV['STEP']&.to_i || 1
 
-    Saloon.each_schema do |schema|
-      if Saloon.schema_exists?(schema)
+    Kari.each_schema do |schema|
+      if Kari.schema_exists?(schema)
         puts "Rolling back schema #{schema}"
-        Saloon.process(schema) do
+        Kari.process(schema) do
           ActiveRecord::Base.connection.migration_context.rollback(step)
         end
       else
@@ -101,10 +101,10 @@ namespace :saloon do
     task :up do
       version = ActiveRecord::Tasks::DatabaseTasks.target_version
 
-      Saloon.each_schema do |schema|
-        if Saloon.schema_exists?(schema)
+      Kari.each_schema do |schema|
+        if Kari.schema_exists?(schema)
           puts "Migrate schema #{schema} up to #{version}"
-          Saloon.process(schema) do
+          Kari.process(schema) do
             ActiveRecord::Base.connection.migration_context.run(:up, version)
           end
         else
@@ -117,10 +117,10 @@ namespace :saloon do
     task :down do
       version = ActiveRecord::Tasks::DatabaseTasks.target_version
 
-      Saloon.each_schema do |schema|
-        if Saloon.schema_exists?(schema)
+      Kari.each_schema do |schema|
+        if Kari.schema_exists?(schema)
           puts "Migrate schema #{schema} down to #{version}"
-          Saloon.process(schema) do
+          Kari.process(schema) do
             ActiveRecord::Base.connection.migration_context.run(:down, version)
           end
         else

@@ -1,4 +1,4 @@
-module Saloon
+module Kari
   module Extensions
 
     module PostgreSQLAdapterExtension
@@ -14,7 +14,7 @@ module Saloon
 
       def exec_query(*args, **kwargs)
         if schema = kwargs.delete(:schema)
-          Saloon.process(schema) do
+          Kari.process(schema) do
             ensure_schema_set
             super
           end
@@ -30,16 +30,16 @@ module Saloon
         return unless @__primed # connection is still in initialization
         return if Rails.env.test?
 
-        if Saloon.current_schema.blank? && Saloon.configuration.raise_if_schema_not_set
-          raise Saloon::SchemaNotSpecified.new("Error: No schema set in current thread!")
+        if Kari.current_schema.blank? && Kari.configuration.raise_if_schema_not_set
+          raise Kari::SchemaNotSpecified.new("Error: No schema set in current thread!")
         end
 
-        if @__schema != Saloon.current_schema
+        if @__schema != Kari.current_schema
           # set first since schema search path setter does execute("SET search_path")...
-          @__schema = Saloon.current_schema
+          @__schema = Kari.current_schema
 
           # now set schema_search_path, which will set search_path
-          self.schema_search_path = "\"#{Saloon.current_schema}\""
+          self.schema_search_path = "\"#{Kari.current_schema}\""
 
           # clear cache since we have to swap schemas
           clear_query_cache

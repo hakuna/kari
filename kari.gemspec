@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
-require_relative "lib/saloon/version"
+require_relative "lib/kari/version"
 
 Gem::Specification.new do |spec|
-  spec.name = "saloon"
-  spec.version = Saloon::VERSION
+  spec.name = "kari"
+  spec.version = Kari::VERSION
   spec.authors = ["Steven Schmid"]
   spec.email = ["steven@hakuna.ch"]
 

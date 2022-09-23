@@ -1,4 +1,4 @@
-module Saloon
+module Kari
   module Extensions
 
     module FutureResultExtension
@@ -8,7 +8,7 @@ module Saloon
       # Async exec be invoked with schema keyword arg, which
       # is handled by PostgreSQLAdapterExtension
       def schedule!(session)
-        @kwargs[:schema] = Saloon.current_schema
+        @kwargs[:schema] = Kari.current_schema
         super
       end
     end

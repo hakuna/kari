@@ -1,11 +1,10 @@
 # frozen_string_literal: true
 
-require_relative "saloon/version"
-require_relative "saloon/railtie"
-require_relative "saloon/current"
+require_relative "kari/version"
+require_relative "kari/railtie"
+require_relative "kari/current"
 
-# Saloon
-module Saloon
+module Kari
   class SchemaNotSpecified < StandardError; end
 
   class << self
@@ -22,7 +21,7 @@ module Saloon
     end
 
     def configuration
-      Rails.application.config.saloon
+      Rails.application.config.kari
     end
 
     def set_global_schema!
@@ -44,11 +43,11 @@ module Saloon
     end
 
     def current_schema=(new_schema)
-      Saloon::Current.schema = new_schema
+      Kari::Current.schema = new_schema
     end
 
     def current_schema
-      Saloon::Current.schema
+      Kari::Current.schema
     end
 
     def schema_exists?(schema)
@@ -70,7 +69,7 @@ module Saloon
     def create_schema(schema)
       connection.create_schema(schema)
       import_global_schema(schema)
-      seed_schema(schema) if Saloon.configuration.seed_after_create
+      seed_schema(schema) if Kari.configuration.seed_after_create
     end
 
     def drop_schema(schema)
