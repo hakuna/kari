@@ -2,8 +2,6 @@ module Saloon
   module Extensions
 
     module PostgreSQLAdapterExtension
-      class SchemaNotSpecified < StandardError; end
-
       def initialize(*args)
         super
         @__primed = true # initialize does some housekeeping via execute (timezone etc., raise SchemaNotSpecified after connection is primed)
@@ -33,7 +31,7 @@ module Saloon
         return if Rails.env.test?
 
         if Saloon.current_schema.blank? && Saloon.configuration.raise_if_schema_not_set
-          raise SchemaNotSpecified.new("Error: No schema set in current thread!")
+          raise Saloon::SchemaNotSpecified.new("Error: No schema set in current thread!")
         end
 
         if @__schema != Saloon.current_schema

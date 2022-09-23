@@ -36,6 +36,8 @@ module Saloon
         table_name = klass.table_name.split('.', 2).last
         klass.table_name = "#{Saloon.configuration.global_schema}.#{table_name}"
       end
+
+      Saloon.set_global_schema!
     end
 
     rake_tasks do

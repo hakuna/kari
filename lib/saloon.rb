@@ -6,6 +6,8 @@ require_relative "saloon/current"
 
 # Saloon
 module Saloon
+  class SchemaNotSpecified < StandardError; end
+
   class << self
     def configure(&block)
       block.call(configuration)
@@ -23,8 +25,13 @@ module Saloon
       Rails.application.config.saloon
     end
 
-    def current
-      Saloon::Current
+    def set_global_schema!
+      self.current_schema = configuration.global_schema
+    end
+
+    def ensure_schema_set!
+      is_schema_set = self.current_schema.present? && self.current_schema != configuration.global_schema
+      raise SchemaNotSpecified.new("Schema is not set or set to global (current schema: '#{self.current_schema}')") unless is_schema_set
     end
 
     def process(schema, &block)
@@ -37,11 +44,11 @@ module Saloon
     end
 
     def current_schema=(new_schema)
-      Current.schema = new_schema
+      Saloon::Current.schema = new_schema
     end
 
     def current_schema
-      Current.schema
+      Saloon::Current.schema
     end
 
     def schema_exists?(schema)
