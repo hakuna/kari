@@ -11,7 +11,7 @@ module Kari
 
     config.kari.global_models = []
     config.kari.global_schema = "public"
-    config.kari.schema_names = []
+    config.kari.schemas = []
     config.kari.seed_after_create = false
 
     config.to_prepare do

@@ -16,10 +16,6 @@ module Kari
       ActiveRecord::Base.connection
     end
 
-    def each_schema(&block)
-      schema_names.each(&block)
-    end
-
     def configuration
       Rails.application.config.kari
     end
@@ -79,14 +75,14 @@ module Kari
       connection.drop_schema(schema)
     end
 
+    def schemas
+      configuration.schemas.respond_to?(:call) ? configuration.schemas.call : configuration.schemas
+    end
+
     private
 
     def current_schema=(new_schema)
       Kari::Current.schema = new_schema
-    end
-
-    def schema_names
-      configuration.schema_names.respond_to?(:call) ? configuration.schema_names.call : configuration.schema_names
     end
   end
 end

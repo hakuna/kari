@@ -20,10 +20,22 @@ AFTER.each do |task_name|
   end
 end
 
+def each_schema(&block)
+  # SCHEMAS=tenant1,tenant2 bundle exec rake db:migrate
+  # can override default schemas
+  schemas = if ENV['SCHEMAS']
+              ENV['SCHEMAS'].split(',').map(&:strip)
+            else
+              Kari.schemas
+            end
+
+  schemas.each(&block)
+end
+
 namespace :kari do
   desc "Create all schemas"
   task :create do
-    Kari.each_schema do |schema|
+    each_schema do |schema|
       if Kari.schema_exists?(schema)
         puts "Schema #{schema} does already exist, cannot create"
       else
@@ -35,7 +47,7 @@ namespace :kari do
 
   desc "Drop all schemas"
   task :drop do
-    Kari.each_schema do |schema|
+    each_schema do |schema|
       if Kari.schema_exists?(schema)
         puts "Drop schema #{schema}"
         Kari.drop_schema(schema)
@@ -47,7 +59,7 @@ namespace :kari do
 
   desc "Migrate all schemas"
   task :migrate do
-    Kari.each_schema do |schema|
+    each_schema do |schema|
       if Kari.schema_exists?(schema)
         puts "Migrate schema #{schema}"
         Kari.process(schema) do
@@ -61,7 +73,7 @@ namespace :kari do
 
   desc "Seed all schemas"
   task :seed do
-    Kari.each_schema do |schema|
+    each_schema do |schema|
       if Kari.schema_exists?(schema)
         puts "Seed schema #{schema}"
         Kari.seed_schema(schema)
@@ -75,7 +87,7 @@ namespace :kari do
   task :rollback do
     step = ENV["STEP"]&.to_i || 1
 
-    Kari.each_schema do |schema|
+    each_schema do |schema|
       if Kari.schema_exists?(schema)
         puts "Rolling back schema #{schema}"
         Kari.process(schema) do
@@ -92,7 +104,7 @@ namespace :kari do
     task :up do
       version = ActiveRecord::Tasks::DatabaseTasks.target_version
 
-      Kari.each_schema do |schema|
+      each_schema do |schema|
         if Kari.schema_exists?(schema)
           puts "Migrate schema #{schema} up to #{version}"
           Kari.process(schema) do
@@ -108,7 +120,7 @@ namespace :kari do
     task :down do
       version = ActiveRecord::Tasks::DatabaseTasks.target_version
 
-      Kari.each_schema do |schema|
+      each_schema do |schema|
         if Kari.schema_exists?(schema)
           puts "Migrate schema #{schema} down to #{version}"
           Kari.process(schema) do
