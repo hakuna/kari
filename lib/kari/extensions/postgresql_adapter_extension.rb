@@ -5,31 +5,26 @@ module Kari
     module PostgreSQLAdapterExtension
       def initialize(*args)
         super
-        @__primed = true # initialize does some housekeeping via execute (timezone etc., raise SchemaNotSpecified after connection is primed)
+        @__initialized = true # initialize does some housekeeping via execute (timezone etc., raise SchemaNotSpecified after connection is primed)
       end
 
       def execute(*args)
-        ensure_schema_set
-        super
+        within_schema_context { super }
       end
 
       def exec_query(*args, **kwargs)
         if schema = kwargs.delete(:schema)
-          Kari.process(schema) do
-            ensure_schema_set
-            super
-          end
+          Kari.process(schema) { within_schema_context { super } }
         else
-          ensure_schema_set
-          super
+          within_schema_context { super}
         end
       end
 
       private
 
-      def ensure_schema_set
-        return unless @__primed # connection is still in initialization
-        return if Rails.env.test?
+      def within_schema_context
+        return yield unless @__initialized # connection is still in initialization
+        return yield if Rails.env.test?
 
         schema = Kari.current_schema.presence || Kari.configuration.global_schema
 
@@ -43,6 +38,8 @@ module Kari
           # clear cache since we have to swap schemas
           clear_query_cache
         end
+
+        yield
       end
     end
   end
