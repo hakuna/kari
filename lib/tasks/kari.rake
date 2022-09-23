@@ -1,15 +1,16 @@
 # frozen_string_literal: true
 
-BEFORE = %w(db:drop)
-AFTER = %w(db:migrate db:create db:seed db:rollback db:migrate:up db:migrate:down)
+BEFORE = %w[db:drop].freeze
+AFTER = %w[db:migrate db:create db:seed db:rollback db:migrate:up db:migrate:down].freeze
 
 Rake::Task.tasks.each do |task|
-  next unless task.scope.path == 'db'
-  task.enhance(['kari:init'])
+  next unless task.scope.path == "db"
+
+  task.enhance(["kari:init"])
 end
 
 def inserted_task_name(task_name)
-  "kari:#{task_name.split(':', 2).last}"
+  "kari:#{task_name.split(":", 2).last}"
 end
 
 BEFORE.each do |task_name|
@@ -25,24 +26,24 @@ AFTER.each do |task_name|
 end
 
 namespace :kari do
-  desc 'Initialize'
+  desc "Initialize"
   task :init do
     Kari.current_schema = Kari.configuration.global_schema
   end
 
-  desc 'Create all schemas'
+  desc "Create all schemas"
   task :create do
     Kari.each_schema do |schema|
-      unless Kari.schema_exists?(schema)
+      if Kari.schema_exists?(schema)
+        puts "Schema #{schema} does already exist, cannot create"
+      else
         puts "Create schema #{schema}"
         Kari.create_schema(schema)
-      else
-        puts "Schema #{schema} does already exist, cannot create"
       end
     end
   end
 
-  desc 'Drop all schemas'
+  desc "Drop all schemas"
   task :drop do
     Kari.each_schema do |schema|
       if Kari.schema_exists?(schema)
@@ -54,7 +55,7 @@ namespace :kari do
     end
   end
 
-  desc 'Migrate all schemas'
+  desc "Migrate all schemas"
   task :migrate do
     Kari.each_schema do |schema|
       if Kari.schema_exists?(schema)
@@ -68,7 +69,7 @@ namespace :kari do
     end
   end
 
-  desc 'Seed all schemas'
+  desc "Seed all schemas"
   task :seed do
     Kari.each_schema do |schema|
       if Kari.schema_exists?(schema)
@@ -80,9 +81,9 @@ namespace :kari do
     end
   end
 
-  desc 'Rolls schemas back to the previous version (specify steps w/ STEP=n)'
+  desc "Rolls schemas back to the previous version (specify steps w/ STEP=n)"
   task :rollback do
-    step = ENV['STEP']&.to_i || 1
+    step = ENV["STEP"]&.to_i || 1
 
     Kari.each_schema do |schema|
       if Kari.schema_exists?(schema)

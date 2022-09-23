@@ -29,12 +29,15 @@ module Kari
     end
 
     def ensure_schema_set!
-      is_schema_set = self.current_schema.present? && self.current_schema != configuration.global_schema
-      raise SchemaNotSpecified.new("Schema is not set or set to global (current schema: '#{self.current_schema}')") unless is_schema_set
+      is_schema_set = current_schema.present? && current_schema != configuration.global_schema
+      unless is_schema_set
+        raise SchemaNotSpecified, "Schema is not set or set to global (current schema: '#{current_schema}')"
+      end
     end
 
     def process(schema, &block)
       raise "Please supply block" unless block_given?
+
       old_schema = current_schema
       self.current_schema = schema
       value = block.call

@@ -1,6 +1,7 @@
+# frozen_string_literal: true
+
 module Kari
   module Extensions
-
     module PostgreSQLAdapterExtension
       def initialize(*args)
         super
@@ -31,7 +32,7 @@ module Kari
         return if Rails.env.test?
 
         if Kari.current_schema.blank? && Kari.configuration.raise_if_schema_not_set
-          raise Kari::SchemaNotSpecified.new("Error: No schema set in current thread!")
+          raise Kari::SchemaNotSpecified, "Error: No schema set in current thread!"
         end
 
         if @__schema != Kari.current_schema
@@ -46,6 +47,5 @@ module Kari
         end
       end
     end
-
   end
 end

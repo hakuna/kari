@@ -1,6 +1,7 @@
+# frozen_string_literal: true
+
 module Kari
   module Extensions
-
     module FutureResultExtension
       class SchemaNotSpecified < StandardError; end
 
@@ -12,6 +13,5 @@ module Kari
         super
       end
     end
-
   end
 end

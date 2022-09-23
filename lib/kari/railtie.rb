@@ -10,7 +10,7 @@ module Kari
     config.kari = ActiveSupport::OrderedOptions.new
 
     config.kari.global_models = []
-    config.kari.global_schema = 'public'
+    config.kari.global_schema = "public"
     config.kari.schema_names = []
     config.kari.raise_if_schema_not_set = true
     config.kari.seed_after_create = false
@@ -33,7 +33,7 @@ module Kari
       Kari.configuration.global_models.each do |global_model|
         klass = global_model.constantize
 
-        table_name = klass.table_name.split('.', 2).last
+        table_name = klass.table_name.split(".", 2).last
         klass.table_name = "#{Kari.configuration.global_schema}.#{table_name}"
       end
 
@@ -41,7 +41,7 @@ module Kari
     end
 
     rake_tasks do
-      load 'tasks/kari.rake'
+      load "tasks/kari.rake"
     end
   end
 end
