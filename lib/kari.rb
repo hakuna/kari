@@ -45,8 +45,8 @@ module Kari
       value
     end
 
-    def current_schema=(new_schema)
-      Kari::Current.schema = new_schema
+    def switch!(schema)
+      self.current_schema = schema
     end
 
     def current_schema
@@ -80,6 +80,10 @@ module Kari
     end
 
     private
+
+    def current_schema=(new_schema)
+      Kari::Current.schema = new_schema
+    end
 
     def schema_names
       configuration.schema_names.respond_to?(:call) ? configuration.schema_names.call : configuration.schema_names

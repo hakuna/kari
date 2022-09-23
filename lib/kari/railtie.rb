@@ -37,6 +37,7 @@ module Kari
         klass.table_name = "#{Kari.configuration.global_schema}.#{table_name}"
       end
 
+      # set global schema as initial schema for console etc.
       Kari.set_global_schema!
     end
 

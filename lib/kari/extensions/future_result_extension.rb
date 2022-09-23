@@ -3,8 +3,6 @@
 module Kari
   module Extensions
     module FutureResultExtension
-      class SchemaNotSpecified < StandardError; end
-
       # Add schema to kwargs when we schedule (load_async support)
       # Async exec be invoked with schema keyword arg, which
       # is handled by PostgreSQLAdapterExtension
