@@ -41,7 +41,7 @@ module Saloon
           @__schema = Saloon.current_schema
 
           # now set schema_search_path, which will set search_path
-          self.schema_search_path = Saloon.current_schema
+          self.schema_search_path = "\"#{Saloon.current_schema}\""
 
           # clear cache since we have to swap schemas
           clear_query_cache

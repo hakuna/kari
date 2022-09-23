@@ -17,7 +17,10 @@ module Saloon
 
     config.to_prepare do
       ActiveRecord::ConnectionAdapters::PostgreSQLAdapter.prepend(Saloon::Extensions::PostgreSQLAdapterExtension)
-      ActiveRecord::FutureResult.prepend(Saloon::Extensions::FutureResultExtension)
+
+      if defined?(ActiveRecord::FutureResult)
+        ActiveRecord::FutureResult.prepend(Saloon::Extensions::FutureResultExtension)
+      end
 
       # tell sidekiq to serialize saloon data for background jobs (if sidekiq is around)
       begin
