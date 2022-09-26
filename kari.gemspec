@@ -8,7 +8,7 @@ Gem::Specification.new do |spec|
   spec.authors = ["Steven Schmid"]
   spec.email = ["steven@hakuna.ch"]
 
-  spec.summary = "Multi-tenancy based on PostgreSQL schemas"
+  spec.summary = "Multi-tenancy using PostgreSQL schemas"
   spec.description = ""
   spec.homepage = "https://www.hakuna.team"
   spec.license = "MIT"
