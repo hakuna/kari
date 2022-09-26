@@ -82,7 +82,11 @@ module Kari
     private
 
     def current_schema=(new_schema)
-      Kari::Current.schema = new_schema
+      Kari::Current.schema = if new_schema == configuration.global_schema
+                               nil
+                             else
+                               new_schema
+                             end
     end
   end
 end
