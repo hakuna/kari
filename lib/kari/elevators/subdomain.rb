@@ -19,12 +19,14 @@ module Kari
 
       def call(env)
         request = Rack::Request.new(env)
-        subdomain = request.host.split('.').first.presence
-        schema = if subdomain.present? && self.class.excluded_subdomains.exclude?(subdomain)
-                   subdomain
-                 else
-                   nil
-                 end
+        schema = nil
+
+        unless ip_host?(request.host)
+          subdomain = request.host.split('.').first.presence
+          if subdomain.present? && self.class.excluded_subdomains.exclude?(subdomain)
+            schema = subdomain
+          end
+        end
 
         if schema
           Kari.process(schema) { @app.call(env) }
@@ -33,6 +35,11 @@ module Kari
         end
       end
 
+      private
+
+      def ip_host?(host)
+        !/^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$/.match(host).nil?
+      end
     end
   end
 end
