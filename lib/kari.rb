@@ -66,13 +66,19 @@ module Kari
     end
 
     def create_schema(schema)
+      return false if schema_exists?(schema)
+
       connection.create_schema(schema)
       import_global_schema(schema)
       seed_schema(schema) if Kari.configuration.seed_after_create
+      true
     end
 
     def drop_schema(schema)
+      return false unless schema_exists?(schema)
+
       connection.drop_schema(schema)
+      true
     end
 
     def schemas
