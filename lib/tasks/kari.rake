@@ -29,7 +29,7 @@ def each_schema(&block)
               begin
                 Kari.schemas
               rescue ActiveRecord::StatementInvalid => ex
-                $stderr.puts "Could not retrieve schemas. Maybe schema was not initialized yet"
+                $stderr.puts "Could not retrieve schemas. Maybe global schema was not initialized yet"
                 []
               end
             end
