@@ -26,7 +26,12 @@ def each_schema(&block)
   schemas = if ENV['SCHEMAS']
               ENV['SCHEMAS'].split(',').map(&:strip)
             else
-              Kari.schemas
+              begin
+                Kari.schemas
+              rescue ActiveRecord::StatementInvalid => ex
+                $stderr.puts "Could not retrieve schemas. Maybe schema was not initialized yet"
+                []
+              end
             end
 
   schemas.each(&block)

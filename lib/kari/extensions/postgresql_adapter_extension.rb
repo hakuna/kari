@@ -24,7 +24,6 @@ module Kari
 
       def within_schema_context
         return yield unless @__initialized # connection is still in initialization
-        return yield if Rails.env.test?
 
         schema = Kari.current_schema.presence || Kari.configuration.global_schema
 
