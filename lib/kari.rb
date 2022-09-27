@@ -5,7 +5,8 @@ require_relative "kari/railtie"
 require_relative "kari/current"
 
 module Kari
-  class SchemaNotSpecified < StandardError; end
+  class SchemaNotFound < StandardError; end
+  class SchemaNotSet < StandardError; end
 
   class << self
     def configure(&block)
@@ -20,14 +21,10 @@ module Kari
       Rails.application.config.kari
     end
 
-    def set_global_schema!
-      self.current_schema = configuration.global_schema
-    end
-
     def ensure_schema_set!
       is_schema_set = current_schema.present? && current_schema != configuration.global_schema
       unless is_schema_set
-        raise SchemaNotSpecified, "Schema is not set or set to global (current schema: '#{current_schema}')"
+        raise SchemaNotSet, "Schema is not set or set to global (current schema: '#{current_schema}')"
       end
     end
 
@@ -88,11 +85,16 @@ module Kari
     private
 
     def current_schema=(new_schema)
-      Kari::Current.schema = if new_schema == configuration.global_schema
-                               nil
-                             else
-                               new_schema
-                             end
+      if new_schema == configuration.global_schema
+        new_schema = nil
+      end
+
+      if new_schema.nil?
+        Kari::Current.schema = nil
+      else
+        raise SchemaNotFound, "Schema '#{new_schema}' does not exist" unless schema_exists?(new_schema)
+        Kari::Current.schema = new_schema
+      end
     end
   end
 end
