@@ -21,10 +21,10 @@ AFTER.each do |task_name|
 end
 
 def each_schema(&block)
-  # SCHEMAS=tenant1,tenant2 bundle exec rake db:migrate
+  # SCHEMA=tenant1,tenant2 bundle exec rake db:migrate
   # can override default schemas
-  schemas = if ENV['SCHEMAS']
-              ENV['SCHEMAS'].split(',').map(&:strip)
+  schemas = if ENV['SCHEMA']
+              ENV['SCHEMA'].split(',').map(&:strip)
             else
               begin
                 Kari.schemas
