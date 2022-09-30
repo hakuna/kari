@@ -6,7 +6,7 @@ require_relative "kari/current"
 
 module Kari
   class SchemaNotFound < StandardError; end
-  class SchemaNotSet < StandardError; end
+  class TenantNotSet < StandardError; end
 
   class << self
     def configure(&block)
@@ -21,80 +21,69 @@ module Kari
       Rails.application.config.kari
     end
 
-    def ensure_schema_set!
-      is_schema_set = current_schema.present? && current_schema != configuration.global_schema
-      unless is_schema_set
-        raise SchemaNotSet, "Schema is not set or set to global (current schema: '#{current_schema}')"
-      end
+    def ensure_tenant_set!
+      raise TenantNotSet unless current_tenant
     end
 
-    def process(schema, &block)
+    def process(tenant, &block)
       raise "Please supply block" unless block_given?
 
-      old_schema = current_schema
-      self.current_schema = schema
+      old_tenant = current_tenant
+      self.current_tenant = tenant
       value = block.call
-      self.current_schema = old_schema
+      self.current_tenant = old_tenant
       value
     end
 
-    def switch!(schema)
-      self.current_schema = schema
+    def switch!(tenant)
+      self.current_tenant = tenant
     end
 
-    def current_schema
-      Kari::Current.schema
+    def current_tenant
+      Kari::Current.tenant
     end
 
-    def schema_exists?(schema)
-      connection.schema_exists?(schema)
+    def schema_exists?(tenant)
+      connection.schema_exists?(tenant)
     end
 
-    def import_global_schema(schema)
-      process(schema) do
+    def import_default_schema(tenant)
+      process(tenant) do
         load Rails.root.join("db/schema.rb")
       end
     end
 
-    def seed_schema(schema)
-      process(schema) do
+    def seed(tenant)
+      process(tenant) do
         load Rails.root.join("db/seeds.rb")
       end
     end
 
-    def create_schema(schema)
-      return false if schema_exists?(schema)
+    def create(tenant)
+      return false if schema_exists?(tenant)
 
-      connection.create_schema(schema)
-      import_global_schema(schema)
-      seed_schema(schema) if Kari.configuration.seed_after_create
+      connection.create_schema(tenant)
+      import_default_schema(tenant)
+      seed(tenant) if Kari.configuration.seed_after_create
       true
     end
 
-    def drop_schema(schema)
-      return false unless schema_exists?(schema)
+    def drop(tenant)
+      return false unless schema_exists?(tenant)
 
-      connection.drop_schema(schema)
+      connection.drop_schema(tenant)
       true
     end
 
-    def schemas
-      configuration.schemas.respond_to?(:call) ? configuration.schemas.call : configuration.schemas
+    def tenants
+      configuration.tenants.respond_to?(:call) ? configuration.tenants.call : configuration.tenants
     end
 
     private
 
-    def current_schema=(new_schema)
-      if new_schema == configuration.global_schema
-        new_schema = nil
-      end
-
-      if new_schema.nil?
-        Kari::Current.schema = nil
-      else
-        raise SchemaNotFound, "Schema '#{new_schema}' does not exist" unless schema_exists?(new_schema)
-        Kari::Current.schema = new_schema
-      end
+    def current_tenant=(tenant)
+      raise SchemaNotFound, "Schema for tenant '#{tenant}' does not exist" if tenant && !schema_exists?(tenant)
+      Kari::Current.tenant = tenant
     end
   end
 end

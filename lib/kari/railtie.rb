@@ -9,9 +9,9 @@ module Kari
   class Railtie < Rails::Railtie
     config.kari = ActiveSupport::OrderedOptions.new
 
-    config.kari.global_models = []
-    config.kari.global_schema = "public"
-    config.kari.schemas = []
+    config.kari.excluded_models = []
+    config.kari.default_schema = "public"
+    config.kari.tenants = []
     config.kari.seed_after_create = false
 
     config.to_prepare do
@@ -28,12 +28,12 @@ module Kari
       rescue LoadError
       end
 
-      # explicitly direct global models to default schema
-      Kari.configuration.global_models.each do |global_model|
-        klass = global_model.constantize
+      # explicitly direct excluded models to default schema
+      Kari.configuration.excluded_models.each do |excluded_model|
+        klass = excluded_model.constantize
 
         table_name = klass.table_name.split(".", 2).last
-        klass.table_name = "#{Kari.configuration.global_schema}.#{table_name}"
+        klass.table_name = "#{Kari.configuration.default_schema}.#{table_name}"
       end
     end
 

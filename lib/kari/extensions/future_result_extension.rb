@@ -7,7 +7,7 @@ module Kari
       # Async exec be invoked with schema keyword arg, which
       # is handled by PostgreSQLAdapterExtension
       def schedule!(session)
-        @kwargs[:schema] = Kari.current_schema
+        @kwargs[:tenant] = Kari.current_tenant
         super
       end
     end

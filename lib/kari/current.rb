@@ -2,6 +2,6 @@
 
 module Kari
   class Current < ActiveSupport::CurrentAttributes
-    attribute :schema
+    attribute :tenant
   end
 end
