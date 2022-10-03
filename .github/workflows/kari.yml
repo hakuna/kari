@@ -10,6 +10,15 @@ jobs:
   specs:
     runs-on: ubuntu-latest
 
+    strategy:
+      matrix:
+        gemfiles: ["gemfiles/rails_6_1.gemfile", "gemfiles/rails_7_0.gemfile"]
+
+    env:
+      DATABASE_URL: postgres://postgres:postgres@localhost:5432
+      RAILS_ENV: test
+      BUNDLE_GEMFILE: ${{ github.workspace }}/gemfiles/${{ matrix.gemfile }}.gemfile
+
     services:
       postgres:
         image: postgres:12
@@ -28,13 +37,7 @@ jobs:
 
       - name: Setup database
         working-directory: ./spec/dummy
-        env:
-          DATABASE_URL: postgres://postgres:postgres@localhost:5432
-          RAILS_ENV: test
         run: bundle exec rake db:prepare
 
       - name: Run tests
-        env:
-          DATABASE_URL: postgres://postgres:postgres@localhost:5432
-          RAILS_ENV: test
         run: bundle exec rspec
