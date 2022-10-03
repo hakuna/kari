@@ -12,7 +12,7 @@ jobs:
 
     strategy:
       matrix:
-        gemfiles: ["gemfiles/rails_6_1.gemfile", "gemfiles/rails_7_0.gemfile"]
+        gemfile: ["gemfiles/rails_6_1.gemfile", "gemfiles/rails_7_0.gemfile"]
 
     env:
       DATABASE_URL: postgres://postgres:postgres@localhost:5432
