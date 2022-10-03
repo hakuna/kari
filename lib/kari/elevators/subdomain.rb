@@ -19,17 +19,17 @@ module Kari
 
       def call(env)
         request = Rack::Request.new(env)
-        schema = nil
+        tenant = nil
 
         unless ip_host?(request.host)
           subdomain = request.host.split('.').first.presence
           if subdomain.present? && self.class.excluded_subdomains.exclude?(subdomain)
-            schema = subdomain
+            tenant = subdomain
           end
         end
 
-        if schema
-          Kari.process(schema) { @app.call(env) }
+        if tenant
+          Kari.process(tenant) { @app.call(env) }
         else
           @app.call(env)
         end
