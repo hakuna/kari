@@ -4,13 +4,13 @@ require "spec_helper"
 require "kari/elevators/subdomain"
 
 RSpec.describe Kari::Elevators::Subdomain do
+  subject { -> { instance.call(env) } }
+
   let(:env) { Rack::MockRequest.env_for(uri, method: :get) }
   let(:uri) { "https://subdomain.kari.test" }
   let(:app) { ->(_env) { [200, {}, "success"] } }
 
   let(:instance) { described_class.new(app) }
-
-  subject { -> { instance.call(env) } }
 
   before do
     allow(Kari).to receive(:process)
@@ -32,16 +32,19 @@ RSpec.describe Kari::Elevators::Subdomain do
 
   context "simple subdomain" do
     let(:uri) { "https://subdomain.kari.test" }
+
     it_behaves_like "a tenant switch", tenant: "subdomain"
   end
 
   context "multiple subdomains" do
     let(:uri) { "https://first.subdomain.here.kari.test" }
+
     it_behaves_like "a tenant switch", tenant: "first"
   end
 
   context "ip" do
     let(:uri) { "https://192.168.1.5" }
+
     it_behaves_like "no tenant switch"
   end
 
@@ -54,16 +57,19 @@ RSpec.describe Kari::Elevators::Subdomain do
 
     context "none excluded" do
       let(:excluded_subdomains) { [] }
+
       it_behaves_like "a tenant switch", tenant: "app"
     end
 
     context "any excluded" do
       let(:excluded_subdomains) { ["test"] }
+
       it_behaves_like "a tenant switch", tenant: "app"
     end
 
     context "any excluded" do
       let(:excluded_subdomains) { %w[test app] }
+
       it_behaves_like "no tenant switch"
     end
   end
