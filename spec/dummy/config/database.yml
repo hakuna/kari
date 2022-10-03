@@ -18,5 +18,4 @@ development:
 # Do not set this db to the same as development or production.
 test:
   <<: *default
-  database: db/test.sqlite3
   database: 'kari_dummy_test'

@@ -1,0 +1,39 @@
+name: Kari
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  specs:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres: image: postgres:12
+      env:
+        POSTGRES_USER: postgres
+        POSTGRES_PASSWORD: postgres
+      ports: ['5432:5432']
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 2.7.5
+          bundler-cache: true # runs 'bundle install' and caches installed gems automatically
+
+      - name: Setup database
+        working-directory: ./spec/dummy
+        env:
+          DATABASE_URL: postgres://postgres:postgres@localhost:5432
+          RAILS_ENV: test
+        run: bundle exec rake db:prepare
+
+      - name: Run tests
+        env:
+          DATABASE_URL: postgres://postgres:postgres@localhost:5432
+          RAILS_ENV: test
+        run: bundle exec rspec
