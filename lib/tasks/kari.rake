@@ -23,13 +23,13 @@ end
 def each_tenant(&block)
   # TENANT=tenant1,tenant2 bundle exec rake db:migrate
   # can override default tenants
-  tenants = if ENV['TENANT']
-              ENV['TENANT'].split(',').map(&:strip)
+  tenants = if ENV["TENANT"]
+              ENV["TENANT"].split(",").map(&:strip)
             else
               begin
                 Kari.tenants
-              rescue ActiveRecord::StatementInvalid => ex
-                $stderr.puts "Could not retrieve tenants. Maybe default schema was not initialized yet."
+              rescue ActiveRecord::StatementInvalid => e
+                warn "Could not retrieve tenants. Maybe default schema was not initialized yet."
                 []
               end
             end
@@ -39,7 +39,7 @@ end
 
 namespace :kari do
   desc "Create all tenants"
-  task :create do
+  task create: :environment do
     each_tenant do |schema|
       if Kari.schema_exists?(tenant)
         puts "Schema for tenant '#{tenant}' does already exist, cannot create"
@@ -51,7 +51,7 @@ namespace :kari do
   end
 
   desc "Drop all schemas"
-  task :drop do
+  task drop: :environment do
     each_tenant do |schema|
       if Kari.schema_exists?(schema)
         puts "Drop schema #{schema}"
@@ -63,7 +63,7 @@ namespace :kari do
   end
 
   desc "Migrate all schemas"
-  task :migrate do
+  task migrate: :environment do
     each_tenant do |schema|
       if Kari.schema_exists?(schema)
         puts "Migrate schema #{schema}"
@@ -77,7 +77,7 @@ namespace :kari do
   end
 
   desc "Seed all schemas"
-  task :seed do
+  task seed: :environment do
     each_tenant do |schema|
       if Kari.schema_exists?(schema)
         puts "Seed schema #{schema}"
@@ -89,7 +89,7 @@ namespace :kari do
   end
 
   desc "Rolls schemas back to the previous version (specify steps w/ STEP=n)"
-  task :rollback do
+  task rollback: :environment do
     step = ENV["STEP"]&.to_i || 1
 
     each_tenant do |schema|
@@ -106,7 +106,7 @@ namespace :kari do
 
   namespace :migrate do
     desc 'Runs the "up" for a given migration VERSION across all schemas'
-    task :up do
+    task up: :environment do
       version = ActiveRecord::Tasks::DatabaseTasks.target_version
 
       each_tenant do |schema|
@@ -122,7 +122,7 @@ namespace :kari do
     end
 
     desc 'Runs the "down" for a given migration VERSION across all schemas'
-    task :down do
+    task down: :environment do
       version = ActiveRecord::Tasks::DatabaseTasks.target_version
 
       each_tenant do |schema|

@@ -29,10 +29,11 @@ Gem::Specification.new do |spec|
   spec.executables = spec.files.grep(%r{\Aexe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
 
-  spec.add_dependency 'rails', '~> 6.1'
-  spec.add_dependency 'pg', '~> 1.4.3'
+  spec.add_dependency "pg", "~> 1.4.3"
+  spec.add_dependency "rails", "~> 6.1"
 
-  spec.add_development_dependency 'rake', '~> 13.0'
-  spec.add_development_dependency 'rspec-rails', '~> 3.4'
-  spec.add_development_dependency 'rubocop', '~> 1.21'
+  spec.add_development_dependency "rake", "~> 13.0"
+  spec.add_development_dependency "rspec-rails", "~> 3.4"
+  spec.add_development_dependency "rubocop", "~> 1.21"
+  spec.add_development_dependency "rubocop-rails", "~> 2.16"
 end

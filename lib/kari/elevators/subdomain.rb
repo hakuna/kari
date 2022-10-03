@@ -3,13 +3,12 @@
 module Kari
   module Elevators
     class Subdomain
-
       def self.excluded_subdomains
         @excluded_subdomains ||= []
       end
 
-      def self.excluded_subdomains=(excluded_subdomains)
-        @excluded_subdomains = excluded_subdomains
+      class << self
+        attr_writer :excluded_subdomains
       end
 
       def initialize(app, environment = Rails.env)
@@ -22,10 +21,8 @@ module Kari
         tenant = nil
 
         unless ip_host?(request.host)
-          subdomain = request.host.split('.').first.presence
-          if subdomain.present? && self.class.excluded_subdomains.exclude?(subdomain)
-            tenant = subdomain
-          end
+          subdomain = request.host.split(".").first.presence
+          tenant = subdomain if subdomain.present? && self.class.excluded_subdomains.exclude?(subdomain)
         end
 
         if tenant

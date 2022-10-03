@@ -1,3 +1,6 @@
+require:
+  - rubocop-rails
+
 AllCops:
   TargetRubyVersion: 2.6
 
@@ -11,4 +14,3 @@ Style/StringLiteralsInInterpolation:
 
 Layout/LineLength:
   Max: 120
-

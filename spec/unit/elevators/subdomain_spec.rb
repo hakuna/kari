@@ -1,10 +1,12 @@
+# frozen_string_literal: true
+
 require "spec_helper"
 require "kari/elevators/subdomain"
 
 RSpec.describe Kari::Elevators::Subdomain do
   let(:env) { Rack::MockRequest.env_for(uri, method: :get) }
   let(:uri) { "https://subdomain.kari.test" }
-  let(:app) { ->(env) { [200, {}, "success"] } }
+  let(:app) { ->(_env) { [200, {}, "success"] } }
 
   let(:instance) { described_class.new(app) }
 
@@ -14,14 +16,14 @@ RSpec.describe Kari::Elevators::Subdomain do
     allow(Kari).to receive(:process)
   end
 
-  shared_examples 'a tenant switch' do |args|
+  shared_examples "a tenant switch" do |args|
     specify do
       expect(Kari).to receive(:process).with(args[:tenant])
       subject.call
     end
   end
 
-  shared_examples 'no tenant switch' do
+  shared_examples "no tenant switch" do
     specify do
       expect(Kari).not_to receive(:process)
       subject.call
@@ -30,17 +32,17 @@ RSpec.describe Kari::Elevators::Subdomain do
 
   context "simple subdomain" do
     let(:uri) { "https://subdomain.kari.test" }
-    it_behaves_like 'a tenant switch', tenant: 'subdomain'
+    it_behaves_like "a tenant switch", tenant: "subdomain"
   end
 
   context "multiple subdomains" do
     let(:uri) { "https://first.subdomain.here.kari.test" }
-    it_behaves_like 'a tenant switch', tenant: 'first'
+    it_behaves_like "a tenant switch", tenant: "first"
   end
 
   context "ip" do
     let(:uri) { "https://192.168.1.5" }
-    it_behaves_like 'no tenant switch'
+    it_behaves_like "no tenant switch"
   end
 
   describe "excluded subdomains" do
@@ -52,17 +54,17 @@ RSpec.describe Kari::Elevators::Subdomain do
 
     context "none excluded" do
       let(:excluded_subdomains) { [] }
-      it_behaves_like 'a tenant switch', tenant: 'app'
+      it_behaves_like "a tenant switch", tenant: "app"
     end
 
     context "any excluded" do
       let(:excluded_subdomains) { ["test"] }
-      it_behaves_like 'a tenant switch', tenant: 'app'
+      it_behaves_like "a tenant switch", tenant: "app"
     end
 
     context "any excluded" do
-      let(:excluded_subdomains) { ["test", "app"] }
-      it_behaves_like 'no tenant switch'
+      let(:excluded_subdomains) { %w[test app] }
+      it_behaves_like "no tenant switch"
     end
   end
 end

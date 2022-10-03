@@ -43,9 +43,7 @@ module Kari
       Kari::Current.tenant
     end
 
-    def schema_exists?(tenant)
-      connection.schema_exists?(tenant)
-    end
+    delegate :schema_exists?, to: :connection
 
     def import_default_schema(tenant)
       process(tenant) do
@@ -83,6 +81,7 @@ module Kari
 
     def current_tenant=(tenant)
       raise SchemaNotFound, "Schema for tenant '#{tenant}' does not exist" if tenant && !schema_exists?(tenant)
+
       Kari::Current.tenant = tenant
     end
   end

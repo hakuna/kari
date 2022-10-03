@@ -1,7 +1,8 @@
+# frozen_string_literal: true
+
 require "spec_helper"
 
 RSpec.describe "Posts", type: :request do
-
   before do
     Kari.create("acme")
     Kari.create("umbrella-corp")
@@ -32,5 +33,4 @@ RSpec.describe "Posts", type: :request do
     expect(response.body).to include("New G-Virus")
     expect(response.body).not_to include("ACME Post")
   end
-
 end
