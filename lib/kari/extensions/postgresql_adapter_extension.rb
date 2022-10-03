@@ -16,7 +16,7 @@ module Kari
         if tenant = kwargs.delete(:tenant)
           Kari.process(tenant) { within_schema_context { super } }
         else
-          within_schema_context { super}
+          within_schema_context { super }
         end
       end
 

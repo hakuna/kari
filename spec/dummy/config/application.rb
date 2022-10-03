@@ -9,10 +9,13 @@ require 'action_mailer/railtie'
 # you've limited to :test, :development, or :production.
 Bundler.require(*Rails.groups)
 require "kari"
+require "kari/elevators/subdomain"
 
 module Dummy
   class Application < Rails::Application
     config.load_defaults Rails::VERSION::STRING.to_f
+
+    config.middleware.use Kari::Elevators::Subdomain
 
     # Configuration for the application, engines, and railties goes here.
     #
