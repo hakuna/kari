@@ -20,6 +20,10 @@ module Dummy
 
     config.middleware.use Kari::Elevators::Subdomain
 
+    if Rails::VERSION::MAJOR >= 7
+      config.active_record.async_query_executor = :global_thread_pool
+    end
+
     # Configuration for the application, engines, and railties goes here.
     #
     # These settings can be overridden in specific environments using the files
