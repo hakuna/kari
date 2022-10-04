@@ -10,4 +10,8 @@ RSpec.describe Kari do
       expect(ActiveRecord::ConnectionAdapters::PostgreSQLAdapter).to include(Kari::Extensions::PostgreSQLAdapterExtension)
     end
   end
+
+  describe "excluded models" do
+    pending
+  end
 end

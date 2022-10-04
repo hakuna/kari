@@ -69,6 +69,7 @@ module Kari
     def drop(tenant)
       return false unless schema_exists?(tenant)
 
+      self.current_tenant = nil if current_tenant == tenant
       connection.drop_schema(tenant)
       true
     end
