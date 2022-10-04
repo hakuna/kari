@@ -1,7 +1,6 @@
 require "spec_helper"
 
 RSpec.describe "Postgresql adapter extension integration" do
-
   before do
     Kari.create("tenant1")
     Kari.switch!("tenant1")
