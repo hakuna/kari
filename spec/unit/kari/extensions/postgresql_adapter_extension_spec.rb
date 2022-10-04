@@ -1,21 +1,20 @@
+# frozen_string_literal: true
+
 require "spec_helper"
 
 RSpec.describe Kari::Extensions::PostgreSQLAdapterExtension do
-
   class MyAdapter
     prepend Kari::Extensions::PostgreSQLAdapterExtension
 
     attr_accessor :schema_search_path
     attr_reader :query_cache_cleared_at
 
-    def execute(*args)
-    end
+    def execute(*args); end
 
-    def exec_query(*args)
-    end
+    def exec_query(*args); end
 
     def clear_query_cache
-      @query_cache_cleared_at = Time.now
+      @query_cache_cleared_at = Time.zone.now
     end
   end
 
@@ -24,7 +23,7 @@ RSpec.describe Kari::Extensions::PostgreSQLAdapterExtension do
   shared_examples "not switching from schema" do |schema|
     specify do
       expect(connection).not_to receive(:clear_query_cache)
-      expect { subject.call }.not_to change { connection.schema_search_path }.from("\"#{schema}\"")
+      expect { subject.call }.not_to change(connection, :schema_search_path).from("\"#{schema}\"")
     end
   end
 
@@ -32,7 +31,7 @@ RSpec.describe Kari::Extensions::PostgreSQLAdapterExtension do
     specify do
       allow(Kari).to receive(:schema_exists?).with(schema).and_return(true) # for Kari.process (tenant kwarg)
       expect(connection).to receive(:clear_query_cache)
-      expect { subject.call }.to change { connection.schema_search_path }.to("\"#{schema}\"")
+      expect { subject.call }.to change(connection, :schema_search_path).to("\"#{schema}\"")
     end
   end
 
@@ -76,5 +75,4 @@ RSpec.describe Kari::Extensions::PostgreSQLAdapterExtension do
 
     it_behaves_like "switching to schema", "asynctenant"
   end
-
 end

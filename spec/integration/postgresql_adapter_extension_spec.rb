@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "spec_helper"
 
 RSpec.describe "Postgresql adapter extension integration" do
@@ -45,5 +47,4 @@ RSpec.describe "Postgresql adapter extension integration" do
       expect(result.rows.count).to eq 2
     end
   end
-
 end
