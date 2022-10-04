@@ -62,7 +62,7 @@ module Kari
 
       connection.create_schema(tenant)
       import_default_schema(tenant)
-      seed(tenant) if Kari.configuration.seed_after_create
+      seed(tenant) if configuration.seed_after_create
       true
     end
 

@@ -5,11 +5,12 @@ require "spec_helper"
 RSpec.describe "Postgresql adapter extension integration" do
   before do
     Kari.create("tenant1")
+    Kari.create("tenant2")
+
     Kari.switch!("tenant1")
     Post.create!(title: "Tenant1: Foo")
     Post.create!(title: "Tenant1: Bar")
 
-    Kari.create("tenant2")
     Kari.switch!("tenant2")
     Post.create!(title: "Tenant2: Hello World")
   end
