@@ -9,23 +9,21 @@ module Kari
       end
 
       def execute(*args)
-        within_schema_context { super }
+        tenant = Kari.current_tenant
+        within_tenant_context(tenant) { super }
       end
 
       def exec_query(*args, **kwargs)
-        if tenant = kwargs.delete(:tenant)
-          Kari.process(tenant) { within_schema_context { super } }
-        else
-          within_schema_context { super }
-        end
+        tenant = kwargs.delete(:tenant) || Kari.current_tenant
+        within_tenant_context(tenant) { super }
       end
 
       private
 
-      def within_schema_context
+      def within_tenant_context(tenant)
         return yield unless @__initialized # connection is still in initialization
 
-        schema = Kari.current_tenant || Kari.configuration.default_schema
+        schema = tenant || Kari.configuration.default_schema
 
         if @__schema != schema
           # set first since schema search path setter does execute("SET search_path")...
