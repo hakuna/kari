@@ -5,12 +5,6 @@ RSpec.describe Kari do
     expect(Kari::VERSION).not_to be nil
   end
 
-  describe "extensions" do
-    it "postgresql adapter extension is loaded" do
-      expect(ActiveRecord::ConnectionAdapters::PostgreSQLAdapter).to include(Kari::Extensions::PostgreSQLAdapterExtension)
-    end
-  end
-
   describe "#connection" do
     subject { described_class.connection }
 
@@ -18,9 +12,9 @@ RSpec.describe Kari do
   end
 
   describe "#ensure_tenant_set!" do
-    before { allow(described_class).to receive(:current_tenant).and_return(current_tenant) }
-
     subject { -> { described_class.ensure_tenant_set! } }
+
+    before { allow(described_class).to receive(:current_tenant).and_return(current_tenant) }
 
     context "tenant set" do
       let(:current_tenant) { "mytenant" }
@@ -36,12 +30,12 @@ RSpec.describe Kari do
   end
 
   describe "#process" do
-    before { allow(described_class).to receive(:schema_exists?).and_return(schema_exists) }
-
     subject { -> { described_class.process(tenant, &block) } }
 
+    before { allow(described_class).to receive(:schema_exists?).and_return(schema_exists) }
+
     let(:block) do
-      -> do
+      lambda do
         expect(described_class.current_tenant).to eq(tenant)
         1234
       end
@@ -56,7 +50,7 @@ RSpec.describe Kari do
 
     it "keeps tenant" do
       described_class.switch!("prevtenant")
-      expect { subject.call }.not_to change { described_class.current_tenant }.from("prevtenant")
+      expect { subject.call }.not_to change(described_class, :current_tenant).from("prevtenant")
     end
 
     context "schema of tenant does not exist" do
@@ -67,14 +61,14 @@ RSpec.describe Kari do
   end
 
   describe "#switch!" do
-    before { allow(described_class).to receive(:schema_exists?).and_return(schema_exists) }
-
     subject { -> { described_class.switch!("newtenant") } }
+
+    before { allow(described_class).to receive(:schema_exists?).and_return(schema_exists) }
 
     context "schema exists" do
       let(:schema_exists) { true }
 
-      specify { expect { subject.call }.to change { described_class.current_tenant }.to("newtenant") }
+      specify { expect { subject.call }.to change(described_class, :current_tenant).to("newtenant") }
     end
 
     context "schema does not exist" do
@@ -85,9 +79,9 @@ RSpec.describe Kari do
   end
 
   describe "#import_default_schema" do
-    before { allow(described_class).to receive(:schema_exists?).and_return(true) }
-
     subject { -> { described_class.import_default_schema("mytenant") } }
+
+    before { allow(described_class).to receive(:schema_exists?).and_return(true) }
 
     it "loads schema in tenant" do
       expect(described_class).to receive(:load).with(Rails.root.join("db/schema.rb")) do
@@ -99,9 +93,9 @@ RSpec.describe Kari do
   end
 
   describe "#seed" do
-    before { allow(described_class).to receive(:schema_exists?).and_return(true) }
-
     subject { -> { described_class.seed("mytenant") } }
+
+    before { allow(described_class).to receive(:schema_exists?).and_return(true) }
 
     it "loads seeds in tenant" do
       expect(described_class).to receive(:load).with(Rails.root.join("db/seeds.rb")) do
@@ -113,6 +107,8 @@ RSpec.describe Kari do
   end
 
   describe "#create" do
+    subject { -> { described_class.create("mytenant") } }
+
     before { allow(described_class).to receive(:schema_exists?).and_return(schema_exists) }
 
     before do
@@ -120,8 +116,6 @@ RSpec.describe Kari do
       allow(described_class).to receive(:import_default_schema)
       allow(described_class).to receive(:seed)
     end
-
-    subject { -> { described_class.create("mytenant") } }
 
     context "tenant does not exist yet" do
       let(:schema_exists) { false }
@@ -174,10 +168,10 @@ RSpec.describe Kari do
   end
 
   describe "#drop" do
+    subject { -> { described_class.drop("mytenant") } }
+
     before { allow(described_class).to receive(:schema_exists?).and_return(schema_exists) }
     before { allow(described_class.connection).to receive(:drop_schema) }
-
-    subject { -> { described_class.drop("mytenant") } }
 
     context "tenant does exist" do
       let(:schema_exists) { true }
@@ -187,6 +181,26 @@ RSpec.describe Kari do
       it "drops schema" do
         expect(described_class.connection).to receive(:drop_schema).with("mytenant")
         subject.call
+      end
+
+      context "current tenant set" do
+        before { described_class.switch!(current_tenant) }
+
+        context "is the one we drop" do
+          let(:current_tenant) { "mytenant" }
+
+          it "resets current tenant" do
+            expect { subject.call }.to change(described_class, :current_tenant).to(nil)
+          end
+        end
+
+        context "not the one we drop" do
+          let(:current_tenant) { "othertenant" }
+
+          it "does not change current tenant" do
+            expect { subject.call }.not_to change(described_class, :current_tenant)
+          end
+        end
       end
     end
 
@@ -203,9 +217,9 @@ RSpec.describe Kari do
   end
 
   describe "#tenants" do
-    before { allow(described_class.configuration).to receive(:tenants).and_return(tenants_config) }
+    subject { described_class.tenants }
 
-    subject {  described_class.tenants }
+    before { allow(described_class.configuration).to receive(:tenants).and_return(tenants_config) }
 
     context "configured as static array" do
       let(:tenants_config) { %w[tenant1 tenant2 other-tenant] }
@@ -215,20 +229,25 @@ RSpec.describe Kari do
 
     context "configured as proc" do
       let(:tenants_config) do
-        -> do
+        lambda do
           [
             { id: 5, tenant: "tenantA" },
-            { id: 22, tenant: "tenantX" },
+            { id: 22, tenant: "tenantX" }
           ].map { |instance| instance[:tenant] }
         end
       end
 
       it { is_expected.to eq %w[tenantA tenantX] }
     end
-
   end
 
-  describe "excluded models" do
-    pending
+  describe "extensions" do
+    it "loaded extension for schema switching in postgresql connection adapter" do
+      expect(ActiveRecord::ConnectionAdapters::PostgreSQLAdapter).to include(Kari::Extensions::PostgreSQLAdapterExtension)
+    end
+
+    it "loaded extension for load_async tenant support through FutureResultExtension", if: Rails::VERSION::MAJOR >= 7 do
+      expect(ActiveRecord::FutureResult).to include(Kari::Extensions::FutureResultExtension)
+    end
   end
 end

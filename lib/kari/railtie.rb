@@ -17,9 +17,7 @@ module Kari
     config.to_prepare do
       ActiveRecord::ConnectionAdapters::PostgreSQLAdapter.prepend(Kari::Extensions::PostgreSQLAdapterExtension)
 
-      if defined?(ActiveRecord::FutureResult)
-        ActiveRecord::FutureResult.prepend(Kari::Extensions::FutureResultExtension)
-      end
+      ActiveRecord::FutureResult.prepend(Kari::Extensions::FutureResultExtension) if Rails::VERSION::MAJOR >= 7
 
       # tell sidekiq to serialize kari data for background jobs (if sidekiq is around)
       begin
@@ -30,7 +28,7 @@ module Kari
 
       # explicitly direct excluded models to default schema
       Kari.configuration.excluded_models.each do |excluded_model|
-        klass = excluded_model.constantize
+        klass = excluded_model.to_s.constantize
 
         table_name = klass.table_name.split(".", 2).last
         klass.table_name = "#{Kari.configuration.default_schema}.#{table_name}"
