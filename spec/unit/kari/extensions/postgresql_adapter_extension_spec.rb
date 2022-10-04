@@ -20,6 +20,8 @@ RSpec.describe Kari::Extensions::PostgreSQLAdapterExtension do
 
   let(:connection) { MyAdapter.new }
 
+  before { allow(Kari).to receive(:schema_exists?).and_return(true) }
+
   shared_examples "not switching from schema" do |schema|
     specify do
       expect(connection).not_to receive(:clear_query_cache)
@@ -29,7 +31,6 @@ RSpec.describe Kari::Extensions::PostgreSQLAdapterExtension do
 
   shared_examples "switching to schema" do |schema|
     specify do
-      allow(Kari).to receive(:schema_exists?).with(schema).and_return(true) # for Kari.process (tenant kwarg)
       expect(connection).to receive(:clear_query_cache)
       expect { subject.call }.to change(connection, :schema_search_path).to("\"#{schema}\"")
     end

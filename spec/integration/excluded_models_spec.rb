@@ -14,6 +14,8 @@ RSpec.describe "excluded models" do
   after do
     Kari.drop("acme")
     Kari.drop("umbrella-corp")
+
+    Tenant.destroy_all
   end
 
   it "distinguishes shared recods of in default schema (excluded_models) and per-tenant records" do
