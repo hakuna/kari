@@ -2,6 +2,7 @@
 
 require_relative "extensions/postgresql_adapter_extension"
 require_relative "extensions/future_result_extension"
+require_relative "extensions/active_job_extension"
 
 require "active_record/connection_adapters/postgresql_adapter"
 
@@ -19,12 +20,7 @@ module Kari
 
       ActiveRecord::FutureResult.prepend(Kari::Extensions::FutureResultExtension) if Rails::VERSION::MAJOR >= 7
 
-      # tell sidekiq to serialize kari data for background jobs (if sidekiq is around)
-      begin
-        require "sidekiq/middleware/current_attributes"
-        Sidekiq::CurrentAttributes.persist(Kari::Current)
-      rescue LoadError
-      end
+      ActiveJob::Base.prepend(Kari::Extensions::ActiveJobExtension) if defined?(ActiveJob::Base)
 
       # explicitly direct excluded models to default schema
       Kari.configuration.excluded_models.each do |excluded_model|

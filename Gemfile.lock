@@ -2,7 +2,7 @@ PATH
   remote: .
   specs:
     kari (0.1.0)
-      pg (~> 1.4.3)
+      pg (~> 1.2)
       rails (>= 6.1, < 7.1)
 
 GEM
