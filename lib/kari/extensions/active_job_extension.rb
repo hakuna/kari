@@ -10,17 +10,17 @@ module Kari
       end
 
       def deserialize(job_data)
-        if @_tenant = job_data["_tenant"]
+        if @__tenant = job_data["_tenant"]
           # we need to be in proper tenant for deserialization
-          Kari.process(@_tenant) { super(job_data.except("_tenant")) }
+          Kari.process(@__tenant) { super(job_data.except("_tenant")) }
         else
           super(job_data)
         end
       end
 
       def perform_now
-        if @_tenant
-          Kari.process(@_tenant) { super }
+        if @__tenant
+          Kari.process(@__tenant) { super }
         else
           super
         end
