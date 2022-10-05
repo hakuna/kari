@@ -105,8 +105,8 @@ RSpec.describe "rake tasks" do
       subject.call
     end
 
-    context 'STEP given' do
-      before { ENV['STEP'] = '42' }
+    context "with STEP given" do
+      before { ENV["STEP"] = "42" }
 
       specify do
         expect(migration_context).to receive(:rollback).with(42).twice
@@ -140,11 +140,11 @@ RSpec.describe "rake tasks" do
         subject.call
       end
 
-      context 'VERSION given' do
-        before { stub_const('ENV', { 'VERSION' => '20221003075254' }) }
+      context "with VERSION given" do
+        before { stub_const("ENV", { "VERSION" => "20221003075254" }) }
 
         specify do
-          expect(migration_context).to receive(:run).with(:up, 20221003075254).twice
+          expect(migration_context).to receive(:run).with(:up, 20_221_003_075_254).twice
           subject.call
         end
       end
@@ -161,22 +161,22 @@ RSpec.describe "rake tasks" do
         subject.call
       end
 
-      context 'VERSION given' do
-        before { stub_const('ENV', { 'VERSION' => '20221003075254' }) }
+      context "with VERSION given" do
+        before { stub_const("ENV", { "VERSION" => "20221003075254" }) }
 
         specify do
-          expect(migration_context).to receive(:run).with(:down, 20221003075254).twice
+          expect(migration_context).to receive(:run).with(:down, 20_221_003_075_254).twice
           subject.call
         end
       end
     end
   end
 
-  context "ENV['TENANT'] specified" do
-    before { allow(Kari).to receive(:schema_exists?).and_return(true) }
-    before { stub_const('ENV', { 'TENANT' => 'foo,bar' }) }
-
+  context "with ENV['TENANT'] specified" do
     subject { -> { capture_rake_task_output("kari:drop") } }
+
+    before { allow(Kari).to receive(:schema_exists?).and_return(true) }
+    before { stub_const("ENV", { "TENANT" => "foo,bar" }) }
 
     specify do
       expect(Kari).to receive(:drop_schema).with("foo")
@@ -192,6 +192,6 @@ RSpec.describe "rake tasks" do
     Rake::Task[task_name].invoke
     $stdout = STDOUT
     Rake.application[task_name].reenable
-    return stdout.string
+    stdout.string
   end
 end

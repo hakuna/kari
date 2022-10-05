@@ -16,13 +16,13 @@ RSpec.describe Kari do
 
     before { allow(described_class).to receive(:current_tenant).and_return(current_tenant) }
 
-    context "tenant set" do
+    context "with tenant set" do
       let(:current_tenant) { "mytenant" }
 
       specify { expect { subject.call }.not_to raise_error }
     end
 
-    context "tenant NOT set" do
+    context "without tenant et" do
       let(:current_tenant) { nil }
 
       specify { expect { subject.call }.to raise_error(described_class::TenantNotSet) }
@@ -53,7 +53,7 @@ RSpec.describe Kari do
       expect { subject.call }.not_to change(described_class, :current_tenant).from("prevtenant")
     end
 
-    context "schema of tenant does not exist" do
+    context "without schema of tenant existing" do
       let(:schema_exists) { false }
 
       specify { expect { subject.call }.to raise_error(described_class::SchemaNotFound) }
@@ -65,13 +65,13 @@ RSpec.describe Kari do
 
     before { allow(described_class).to receive(:schema_exists?).and_return(schema_exists) }
 
-    context "schema exists" do
+    context "with schema of tenant existing" do
       let(:schema_exists) { true }
 
       specify { expect { subject.call }.to change(described_class, :current_tenant).to("newtenant") }
     end
 
-    context "schema does not exist" do
+    context "without schema of tenant existing" do
       let(:schema_exists) { false }
 
       specify { expect { subject.call }.to raise_error(described_class::SchemaNotFound) }
@@ -132,10 +132,10 @@ RSpec.describe Kari do
         subject.call
       end
 
-      context "seed_after_create" do
+      describe "seed_after_create" do
         before { allow(described_class.configuration).to receive(:seed_after_create).and_return(seed_after_create) }
 
-        context "enabled" do
+        context "with seeding enabled" do
           let(:seed_after_create) { true }
 
           it "loads seeds" do
@@ -144,7 +144,7 @@ RSpec.describe Kari do
           end
         end
 
-        context "disabled" do
+        context "without seeding enabled" do
           let(:seed_after_create) { false }
 
           it "does not load seeds" do
@@ -155,7 +155,7 @@ RSpec.describe Kari do
       end
     end
 
-    context "tenant does already exist" do
+    context "without tenant existing" do
       let(:schema_exists) { true }
 
       specify { expect(subject.call).to eq false }
@@ -173,7 +173,7 @@ RSpec.describe Kari do
     before { allow(described_class).to receive(:schema_exists?).and_return(schema_exists) }
     before { allow(described_class.connection).to receive(:drop_schema) }
 
-    context "tenant does exist" do
+    context "without tenant existing" do
       let(:schema_exists) { true }
 
       specify { expect(subject.call).to eq true }
@@ -183,11 +183,11 @@ RSpec.describe Kari do
         subject.call
       end
 
-      context "current tenant set" do
+      context "with current tenant set" do
         before { described_class.switch!(current_tenant) }
         after { described_class.switch!(nil) }
 
-        context "is the one we drop" do
+        context "with matches the one we drop" do
           let(:current_tenant) { "mytenant" }
 
           it "resets current tenant" do
@@ -195,7 +195,7 @@ RSpec.describe Kari do
           end
         end
 
-        context "not the one we drop" do
+        context "which does not match the one we drop" do
           let(:current_tenant) { "othertenant" }
 
           it "does not change current tenant" do
@@ -205,7 +205,7 @@ RSpec.describe Kari do
       end
     end
 
-    context "tenant does not exist" do
+    context "without tenant existing" do
       let(:schema_exists) { false }
 
       specify { expect(subject.call).to eq false }
@@ -222,13 +222,13 @@ RSpec.describe Kari do
 
     before { allow(described_class.configuration).to receive(:tenants).and_return(tenants_config) }
 
-    context "configured as static array" do
+    context "with configuration as static array" do
       let(:tenants_config) { %w[tenant1 tenant2 other-tenant] }
 
       it { is_expected.to eq %w[tenant1 tenant2 other-tenant] }
     end
 
-    context "configured as proc" do
+    context "with configuration as proc" do
       let(:tenants_config) do
         lambda do
           [

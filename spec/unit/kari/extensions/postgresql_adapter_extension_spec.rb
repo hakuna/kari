@@ -40,24 +40,24 @@ RSpec.describe Kari::Extensions::PostgreSQLAdapterExtension do
     before { allow(Kari).to receive(:current_tenant).and_return(current_tenant) }
     before { allow(Kari.configuration).to receive(:default_schema).and_return("mydefault") }
 
-    context "tenant set" do
+    context "with tenant set" do
       let(:current_tenant) { "mytenant" }
 
       it_behaves_like "switching to schema", "mytenant"
 
-      context "already set" do
+      context "with tenant already set" do
         before { subject.call }
 
         it_behaves_like "not switching from schema", "mytenant"
       end
     end
 
-    context "tenant not set" do
+    context "with tenant not set" do
       let(:current_tenant) { nil }
 
       it_behaves_like "switching to schema", "mydefault"
 
-      context "already set" do
+      context "with tenant already set" do
         before { subject.call }
 
         it_behaves_like "not switching from schema", "mydefault"

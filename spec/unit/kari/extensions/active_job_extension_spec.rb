@@ -19,17 +19,17 @@ RSpec.describe Kari::Extensions::ActiveJobExtension do
     end
   end
 
-  let(:job) { MyActiveJob .new }
+  let(:job) { MyActiveJob.new }
 
   before { allow(Kari).to receive(:current_tenant).and_return("mytenant") }
 
-  describe 'serialization' do
+  describe "serialization" do
     subject { -> { job.serialize } }
 
-    it 'serializes w/ current tenant' do
+    it "serializes w/ current tenant" do
       expect(subject.call).to match(
         "enqueued_at" => anything,
-        "_tenant" => "mytenant",
+        "_tenant" => "mytenant"
       )
     end
   end
@@ -39,7 +39,7 @@ RSpec.describe Kari::Extensions::ActiveJobExtension do
 
     let(:job_data) { { "job_class" => "MyActiveJob", "_tenant" => tenant }.compact }
 
-    context "tenant in job data" do
+    context "with tenant in job data" do
       let(:tenant) { "acme" }
 
       specify do
@@ -49,7 +49,7 @@ RSpec.describe Kari::Extensions::ActiveJobExtension do
       end
     end
 
-    context "no tenant in job data" do
+    context "without tenant in job data" do
       let(:tenant) { nil }
 
       specify do
@@ -68,7 +68,7 @@ RSpec.describe Kari::Extensions::ActiveJobExtension do
     before { allow(Kari).to receive(:schema_exists?).and_return(true) }
     before { job.deserialize(job_data) }
 
-    context "tenant in job data " do
+    context "when tenant in job data" do
       let(:tenant) { "acme" }
 
       specify do
@@ -78,7 +78,7 @@ RSpec.describe Kari::Extensions::ActiveJobExtension do
       end
     end
 
-    context "no tenant in job data" do
+    context "when no tenant in job data" do
       let(:tenant) { nil }
 
       specify do

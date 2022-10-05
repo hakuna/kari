@@ -30,19 +30,19 @@ RSpec.describe Kari::Elevators::Subdomain do
     end
   end
 
-  context "simple subdomain" do
+  context "with simple subdomain" do
     let(:uri) { "https://subdomain.kari.test" }
 
     it_behaves_like "a tenant switch", tenant: "subdomain"
   end
 
-  context "multiple subdomains" do
+  context "with multiple subdomains" do
     let(:uri) { "https://first.subdomain.here.kari.test" }
 
     it_behaves_like "a tenant switch", tenant: "first"
   end
 
-  context "ip" do
+  context "with ip" do
     let(:uri) { "https://192.168.1.5" }
 
     it_behaves_like "no tenant switch"
@@ -55,19 +55,19 @@ RSpec.describe Kari::Elevators::Subdomain do
 
     let(:uri) { "https://app.kari.test" }
 
-    context "none excluded" do
+    context "without excluded" do
       let(:excluded_subdomains) { [] }
 
       it_behaves_like "a tenant switch", tenant: "app"
     end
 
-    context "any excluded" do
+    context "with excluded" do
       let(:excluded_subdomains) { ["test"] }
 
       it_behaves_like "a tenant switch", tenant: "app"
     end
 
-    context "any excluded" do
+    context "with excluded including requested" do
       let(:excluded_subdomains) { %w[test app] }
 
       it_behaves_like "no tenant switch"
