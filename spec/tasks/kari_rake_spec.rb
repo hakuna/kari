@@ -172,6 +172,20 @@ RSpec.describe "rake tasks" do
     end
   end
 
+  context "ENV['TENANT'] specified" do
+    before { allow(Kari).to receive(:schema_exists?).and_return(true) }
+    before { stub_const('ENV', { 'TENANT' => 'foo,bar' }) }
+
+    subject { -> { capture_rake_task_output("kari:drop") } }
+
+    specify do
+      expect(Kari).to receive(:drop_schema).with("foo")
+      expect(Kari).to receive(:drop_schema).with("bar")
+
+      subject.call
+    end
+  end
+
   def capture_rake_task_output(task_name)
     stdout = StringIO.new
     $stdout = stdout

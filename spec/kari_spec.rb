@@ -185,6 +185,7 @@ RSpec.describe Kari do
 
       context "current tenant set" do
         before { described_class.switch!(current_tenant) }
+        after { described_class.switch!(nil) }
 
         context "is the one we drop" do
           let(:current_tenant) { "mytenant" }
