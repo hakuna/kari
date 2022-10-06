@@ -14,15 +14,15 @@ RSpec.describe "rake tasks" do
     subject { -> { capture_rake_task_output("kari:create") } }
 
     before do
-      allow(Kari).to receive(:schema_exists?).and_return(false)
+      allow(Kari).to receive(:exists?).and_return(false)
       # acme already exists
-      allow(Kari).to receive(:schema_exists?).with("acme").and_return(true)
+      allow(Kari).to receive(:exists?).with("acme").and_return(true)
     end
 
     specify do
-      expect(Kari).to receive(:create_schema).with("foo-inc")
-      expect(Kari).to receive(:create_schema).with("star")
-      expect(Kari).not_to receive(:create_schema).with("acme")
+      expect(Kari).to receive(:create).with("foo-inc")
+      expect(Kari).to receive(:create).with("star")
+      expect(Kari).not_to receive(:create).with("acme")
       subject.call
     end
   end
@@ -31,15 +31,15 @@ RSpec.describe "rake tasks" do
     subject { -> { capture_rake_task_output("kari:drop") } }
 
     before do
-      allow(Kari).to receive(:schema_exists?).and_return(false)
+      allow(Kari).to receive(:exists?).and_return(false)
       # acme already exists
-      allow(Kari).to receive(:schema_exists?).with("acme").and_return(true)
+      allow(Kari).to receive(:exists?).with("acme").and_return(true)
     end
 
     specify do
-      expect(Kari).not_to receive(:drop_schema).with("foo-inc")
-      expect(Kari).not_to receive(:drop_schema).with("star")
-      expect(Kari).to receive(:drop_schema).with("acme")
+      expect(Kari).not_to receive(:drop).with("foo-inc")
+      expect(Kari).not_to receive(:drop).with("star")
+      expect(Kari).to receive(:drop).with("acme")
       subject.call
     end
   end
@@ -48,9 +48,9 @@ RSpec.describe "rake tasks" do
     subject { -> { capture_rake_task_output("kari:migrate") } }
 
     before do
-      allow(Kari).to receive(:schema_exists?).and_return(false)
+      allow(Kari).to receive(:exists?).and_return(false)
       # acme exists
-      allow(Kari).to receive(:schema_exists?).with("acme").and_return(true)
+      allow(Kari).to receive(:exists?).with("acme").and_return(true)
     end
 
     specify do
@@ -66,16 +66,16 @@ RSpec.describe "rake tasks" do
     subject { -> { capture_rake_task_output("kari:seed") } }
 
     before do
-      allow(Kari).to receive(:schema_exists?).and_return(false)
+      allow(Kari).to receive(:exists?).and_return(false)
 
-      allow(Kari).to receive(:schema_exists?).with("acme").and_return(true)
-      allow(Kari).to receive(:schema_exists?).with("star").and_return(true)
+      allow(Kari).to receive(:exists?).with("acme").and_return(true)
+      allow(Kari).to receive(:exists?).with("star").and_return(true)
     end
 
     specify do
-      expect(Kari).not_to receive(:seed_schema).with("foo-inc")
-      expect(Kari).to receive(:seed_schema).with("star")
-      expect(Kari).to receive(:seed_schema).with("acme")
+      expect(Kari).not_to receive(:seed).with("foo-inc")
+      expect(Kari).to receive(:seed).with("star")
+      expect(Kari).to receive(:seed).with("acme")
 
       subject.call
     end
@@ -88,10 +88,10 @@ RSpec.describe "rake tasks" do
     let(:migration_context) { double }
 
     before do
-      allow(Kari).to receive(:schema_exists?).and_return(false)
+      allow(Kari).to receive(:exists?).and_return(false)
 
-      allow(Kari).to receive(:schema_exists?).with("acme").and_return(true)
-      allow(Kari).to receive(:schema_exists?).with("star").and_return(true)
+      allow(Kari).to receive(:exists?).with("acme").and_return(true)
+      allow(Kari).to receive(:exists?).with("star").and_return(true)
 
       allow(ActiveRecord::Base).to receive(:connection).and_return(conn)
       allow(conn).to receive(:migration_context).and_return(migration_context)
@@ -120,10 +120,10 @@ RSpec.describe "rake tasks" do
     let(:migration_context) { double }
 
     before do
-      allow(Kari).to receive(:schema_exists?).and_return(false)
+      allow(Kari).to receive(:exists?).and_return(false)
 
-      allow(Kari).to receive(:schema_exists?).with("acme").and_return(true)
-      allow(Kari).to receive(:schema_exists?).with("star").and_return(true)
+      allow(Kari).to receive(:exists?).with("acme").and_return(true)
+      allow(Kari).to receive(:exists?).with("star").and_return(true)
 
       allow(ActiveRecord::Base).to receive(:connection).and_return(conn)
       allow(conn).to receive(:migration_context).and_return(migration_context)
@@ -175,12 +175,12 @@ RSpec.describe "rake tasks" do
   context "with ENV['TENANT'] specified" do
     subject { -> { capture_rake_task_output("kari:drop") } }
 
-    before { allow(Kari).to receive(:schema_exists?).and_return(true) }
+    before { allow(Kari).to receive(:exists?).and_return(true) }
     before { stub_const("ENV", { "TENANT" => "foo,bar" }) }
 
     specify do
-      expect(Kari).to receive(:drop_schema).with("foo")
-      expect(Kari).to receive(:drop_schema).with("bar")
+      expect(Kari).to receive(:drop).with("foo")
+      expect(Kari).to receive(:drop).with("bar")
 
       subject.call
     end

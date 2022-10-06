@@ -32,7 +32,7 @@ RSpec.describe Kari do
   describe "#process" do
     subject { -> { described_class.process(tenant, &block) } }
 
-    before { allow(described_class).to receive(:schema_exists?).and_return(schema_exists) }
+    before { allow(described_class).to receive(:exists?).and_return(schema_exists) }
 
     let(:block) do
       lambda do
@@ -63,7 +63,7 @@ RSpec.describe Kari do
   describe "#switch!" do
     subject { -> { described_class.switch!("newtenant") } }
 
-    before { allow(described_class).to receive(:schema_exists?).and_return(schema_exists) }
+    before { allow(described_class).to receive(:exists?).and_return(schema_exists) }
 
     context "with schema of tenant existing" do
       let(:schema_exists) { true }
@@ -81,7 +81,7 @@ RSpec.describe Kari do
   describe "#import_default_schema" do
     subject { -> { described_class.import_default_schema("mytenant") } }
 
-    before { allow(described_class).to receive(:schema_exists?).and_return(true) }
+    before { allow(described_class).to receive(:exists?).and_return(true) }
 
     it "loads schema in tenant" do
       expect(described_class).to receive(:load).with(Rails.root.join("db/schema.rb")) do
@@ -95,7 +95,7 @@ RSpec.describe Kari do
   describe "#seed" do
     subject { -> { described_class.seed("mytenant") } }
 
-    before { allow(described_class).to receive(:schema_exists?).and_return(true) }
+    before { allow(described_class).to receive(:exists?).and_return(true) }
 
     it "loads seeds in tenant" do
       expect(described_class).to receive(:load).with(Rails.root.join("db/seeds.rb")) do
@@ -109,7 +109,7 @@ RSpec.describe Kari do
   describe "#create" do
     subject { -> { described_class.create("mytenant") } }
 
-    before { allow(described_class).to receive(:schema_exists?).and_return(schema_exists) }
+    before { allow(described_class).to receive(:exists?).and_return(schema_exists) }
 
     before do
       allow(described_class.connection).to receive(:create_schema)
@@ -170,7 +170,7 @@ RSpec.describe Kari do
   describe "#drop" do
     subject { -> { described_class.drop("mytenant") } }
 
-    before { allow(described_class).to receive(:schema_exists?).and_return(schema_exists) }
+    before { allow(described_class).to receive(:exists?).and_return(schema_exists) }
     before { allow(described_class.connection).to receive(:drop_schema) }
 
     context "without tenant existing" do

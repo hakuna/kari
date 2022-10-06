@@ -12,8 +12,11 @@ RSpec.describe Kari::Elevators::Subdomain do
 
   let(:instance) { described_class.new(app) }
 
+  let(:tenant_exists) { true }
+
   before do
     allow(Kari).to receive(:process)
+    allow(Kari).to receive(:exists?).and_return(tenant_exists)
   end
 
   shared_examples "a tenant switch" do |args|
@@ -34,12 +37,24 @@ RSpec.describe Kari::Elevators::Subdomain do
     let(:uri) { "https://subdomain.kari.test" }
 
     it_behaves_like "a tenant switch", tenant: "subdomain"
+
+    context "without tenant existing" do
+      let(:tenant_exists) { false }
+
+      it_behaves_like "no tenant switch"
+    end
   end
 
   context "with multiple subdomains" do
     let(:uri) { "https://first.subdomain.here.kari.test" }
 
     it_behaves_like "a tenant switch", tenant: "first"
+
+    context "without tenant existing" do
+      let(:tenant_exists) { false }
+
+      it_behaves_like "no tenant switch"
+    end
   end
 
   context "with ip" do
@@ -55,19 +70,19 @@ RSpec.describe Kari::Elevators::Subdomain do
 
     let(:uri) { "https://app.kari.test" }
 
-    context "without excluded" do
-      let(:excluded_subdomains) { [] }
-
-      it_behaves_like "a tenant switch", tenant: "app"
-    end
-
-    context "with excluded" do
+    context "without this subdomain excluded" do
       let(:excluded_subdomains) { ["test"] }
 
       it_behaves_like "a tenant switch", tenant: "app"
+
+      context "without tenant existing" do
+        let(:tenant_exists) { false }
+
+        it_behaves_like "no tenant switch"
+      end
     end
 
-    context "with excluded including requested" do
+    context "with this subdomain excluded" do
       let(:excluded_subdomains) { %w[test app] }
 
       it_behaves_like "no tenant switch"

@@ -41,11 +41,11 @@ namespace :kari do
   desc "Create all tenant schemas"
   task create: :environment do
     each_tenant do |tenant|
-      if Kari.schema_exists?(tenant)
+      if Kari.exists?(tenant)
         puts "Schema for tenant '#{tenant}' does already exist, cannot create"
       else
         puts "Create schema for tenant '#{tenant}"
-        Kari.create_schema(tenant)
+        Kari.create(tenant)
       end
     end
   end
@@ -53,9 +53,9 @@ namespace :kari do
   desc "Drop all tenant schemas"
   task drop: :environment do
     each_tenant do |tenant|
-      if Kari.schema_exists?(tenant)
+      if Kari.exists?(tenant)
         puts "Drop schema for trenant '#{tenant}'"
-        Kari.drop_schema(tenant)
+        Kari.drop(tenant)
       else
         puts "Schema for tenant '#{tenant}' does not exist, cannot drop"
       end
@@ -65,7 +65,7 @@ namespace :kari do
   desc "Migrate all tenant schemas"
   task migrate: :environment do
     each_tenant do |tenant|
-      if Kari.schema_exists?(tenant)
+      if Kari.exists?(tenant)
         puts "Migrate schema for '#{tenant}'"
         Kari.process(tenant) do
           ActiveRecord::Tasks::DatabaseTasks.migrate
@@ -78,12 +78,12 @@ namespace :kari do
 
   desc "Seed all tenant schemas"
   task seed: :environment do
-    each_tenant do |schema|
-      if Kari.schema_exists?(schema)
-        puts "Seed schema for tenant '#{schema}'"
-        Kari.seed_schema(schema)
+    each_tenant do |tenant|
+      if Kari.exists?(tenant)
+        puts "Seed schema for tenant '#{tenant}'"
+        Kari.seed(tenant)
       else
-        puts "Schema for tenant '#{schema}' does not exist, cannot seed"
+        puts "Schema for tenant '#{tenant}' does not exist, cannot seed"
       end
     end
   end
@@ -93,7 +93,7 @@ namespace :kari do
     step = ENV["STEP"]&.to_i || 1
 
     each_tenant do |tenant|
-      if Kari.schema_exists?(tenant)
+      if Kari.exists?(tenant)
         puts "Rolling back schema of tenant '#{tenant}'"
         Kari.process(tenant) do
           ActiveRecord::Base.connection.migration_context.rollback(step)
@@ -110,7 +110,7 @@ namespace :kari do
       version = ActiveRecord::Tasks::DatabaseTasks.target_version
 
       each_tenant do |tenant|
-        if Kari.schema_exists?(tenant)
+        if Kari.exists?(tenant)
           puts "Migrate schema for tenant '#{tenant}' up to #{version}"
           Kari.process(tenant) do
             ActiveRecord::Base.connection.migration_context.run(:up, version)
@@ -126,7 +126,7 @@ namespace :kari do
       version = ActiveRecord::Tasks::DatabaseTasks.target_version
 
       each_tenant do |tenant|
-        if Kari.schema_exists?(tenant)
+        if Kari.exists?(tenant)
           puts "Migrate schema for tenant '#{tenant}' down to #{version}"
           Kari.process(tenant) do
             ActiveRecord::Base.connection.migration_context.run(:down, version)

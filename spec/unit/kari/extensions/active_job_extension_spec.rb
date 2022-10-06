@@ -65,7 +65,7 @@ RSpec.describe Kari::Extensions::ActiveJobExtension do
 
     let(:job_data) { { "job_class" => "MyActiveJob", "_tenant" => tenant }.compact }
 
-    before { allow(Kari).to receive(:schema_exists?).and_return(true) }
+    before { allow(Kari).to receive(:exists?).and_return(true) }
     before { job.deserialize(job_data) }
 
     context "when tenant in job data" do

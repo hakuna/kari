@@ -25,7 +25,7 @@ module Kari
           tenant = subdomain if subdomain.present? && self.class.excluded_subdomains.exclude?(subdomain)
         end
 
-        if tenant
+        if tenant && Kari.exists?(tenant)
           Kari.process(tenant) { @app.call(env) }
         else
           @app.call(env)

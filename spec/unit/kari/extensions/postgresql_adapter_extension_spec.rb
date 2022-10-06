@@ -20,7 +20,7 @@ RSpec.describe Kari::Extensions::PostgreSQLAdapterExtension do
 
   let(:connection) { MyAdapter.new }
 
-  before { allow(Kari).to receive(:schema_exists?).and_return(true) }
+  before { allow(Kari).to receive(:exists?).and_return(true) }
 
   shared_examples "not switching from schema" do |schema|
     specify do
