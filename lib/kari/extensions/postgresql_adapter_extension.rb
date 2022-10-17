@@ -3,42 +3,53 @@
 module Kari
   module Extensions
     module PostgreSQLAdapterExtension
-      def initialize(*args)
-        super
-        @__initialized = true # initialize does some housekeeping via execute (timezone etc., raise SchemaNotSpecified after connection is primed)
-      end
-
       def execute(*args)
-        within_schema_context { super }
+        ensure_correct_schema_search_path!
+        super
       end
 
       def exec_query(*args, **kwargs)
         if tenant = kwargs.delete(:tenant)
-          Kari.process(tenant) { within_schema_context { super } }
+          Kari.process(tenant) do
+            ensure_correct_schema_search_path!
+            super
+          end
         else
-          within_schema_context { super }
+          ensure_correct_schema_search_path!
+          super
         end
+      end
+
+      def configure_connection
+        # connection init or reset
+        # make sure we (re-)set search_path later
+        super
+        @schema_search_path = nil
+      end
+
+      def schema_search_path=(schema_csv)
+        if schema_csv
+          method(:execute).super_method.call("SET search_path TO #{schema_csv}", "SCHEMA")
+          @schema_search_path = schema_csv
+        end
+      end
+
+      def schema_search_path
+        @schema_search_path ||= query_value("SHOW search_path", "SCHEMA")
       end
 
       private
 
-      def within_schema_context
-        return yield unless @__initialized # connection is still in initialization
+      def ensure_correct_schema_search_path!
+        search_path = Kari.current_tenant ? "\"#{Kari.current_tenant}\"" : Kari.configuration.default_schema
 
-        schema = Kari.current_tenant || Kari.configuration.default_schema
+        if @schema_search_path != search_path
+          # set correct schema search path
+          self.schema_search_path = search_path
 
-        if @__schema != schema
-          # set first since schema search path setter does execute("SET search_path")...
-          @__schema = schema
-
-          # now set schema_search_path, which will set search_path
-          self.schema_search_path = "\"#{schema}\""
-
-          # clear cache since we have to swap schemas
+          # clear cache since we swapped schemas
           clear_query_cache
         end
-
-        yield
       end
     end
   end
