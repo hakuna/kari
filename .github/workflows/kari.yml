@@ -40,4 +40,4 @@ jobs:
         run: bundle exec rake db:prepare
 
       - name: Run tests
-        run: bundle exec rspec
+        run: bundle exec rspec --backtrace
