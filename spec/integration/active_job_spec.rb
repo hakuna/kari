@@ -34,4 +34,15 @@ RSpec.describe "active job support" do
     end.to change { Kari.switch!("acme"); acme_post.reload.updated_at }
       .and not_change { Kari.switch!("umbrella-corp"); umbrella_post.reload.updated_at  }
   end
+
+  it "supports rescue for case when tenant is no longer around (e.g. deleted in meantime)" do
+    Kari.create("temp")
+    Kari.switch!("temp")
+    temp_post = Post.create!(title: "Umbrella Post")
+    TouchJob.perform_later(temp_post)
+    Kari.drop("temp")
+
+    expect(Rails.logger).to receive(:error).with('All is lost!')
+    expect { perform_enqueued_jobs }.not_to raise_error
+  end
 end

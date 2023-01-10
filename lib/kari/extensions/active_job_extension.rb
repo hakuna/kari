@@ -19,6 +19,9 @@ module Kari
         else
           super
         end
+      rescue Kari::SchemaNotFound => exception
+        # allow rescue_from
+        rescue_with_handler(exception) || raise
       end
 
     end
