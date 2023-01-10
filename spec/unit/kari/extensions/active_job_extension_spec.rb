@@ -34,7 +34,8 @@ RSpec.describe Kari::Extensions::ActiveJobExtension do
     end
   end
 
-  context "deserialize" do
+  # deserialization of job_data (these are not the arguments! argument deserialization is first step in #execute)
+  describe "deserialization" do
     subject { -> { job.deserialize(job_data) } }
 
     let(:job_data) { { "job_class" => "MyActiveJob", "_tenant" => tenant }.compact }
@@ -43,9 +44,7 @@ RSpec.describe Kari::Extensions::ActiveJobExtension do
       let(:tenant) { "acme" }
 
       specify do
-        expect(Kari).to receive(:process).with("acme")
-
-        subject.call
+        expect { subject.call }.to change { job.instance_variable_get(:@__tenant) }.to("acme")
       end
     end
 
@@ -53,13 +52,12 @@ RSpec.describe Kari::Extensions::ActiveJobExtension do
       let(:tenant) { nil }
 
       specify do
-        expect(Kari).not_to receive(:process)
-
-        subject.call
+        expect { subject.call }.not_to change { job.instance_variable_get(:@__tenant) }.from(nil)
       end
     end
   end
 
+  # perform encompasses execution (which in turn deserializes arguments)
   context "perform_now" do
     subject { -> { job.perform_now } }
 
