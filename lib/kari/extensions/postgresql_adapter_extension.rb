@@ -3,6 +3,11 @@
 module Kari
   module Extensions
     module PostgreSQLAdapterExtension
+      def cache_sql(*args)
+        ensure_correct_schema_search_path!
+        super
+      end
+
       def execute(*args)
         ensure_correct_schema_search_path!
         super

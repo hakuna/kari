@@ -13,6 +13,10 @@ RSpec.describe Kari::Extensions::PostgreSQLAdapterExtension do
       # init/reset
     end
 
+    def cache_sql(*args)
+      # cache_sql
+    end
+
     def execute(*args)
       # execute
     end
@@ -36,14 +40,14 @@ RSpec.describe Kari::Extensions::PostgreSQLAdapterExtension do
 
   shared_examples "not changing schema search path" do |search_path|
     specify do
-      expect(connection).not_to receive(:clear_query_cache)
+      expect(connection).not_to receive(:clear_query_cache) 
       expect { subject.call }.not_to change(connection, :schema_search_path).from(search_path)
     end
   end
 
   shared_examples "changing schema search path" do |search_path|
     specify do
-      expect(connection).to receive(:clear_query_cache)
+      expect(connection).to receive(:clear_query_cache) # ensure cache is cleared
       expect { subject.call }.to change(connection, :schema_search_path).to(search_path)
     end
   end
@@ -75,6 +79,14 @@ RSpec.describe Kari::Extensions::PostgreSQLAdapterExtension do
         it_behaves_like "not changing schema search path", "mydefault"
       end
     end
+  end
+
+  describe "#cache_sql" do
+    # in a query cached environment (within a action), query will not be executed if it's cached,
+    # so we have to ensure we clear cache in cache_sql upon schema switch
+    subject { -> { connection.cache_sql("SELECT * FROM posts") } }
+
+    it_behaves_like "schema context switching"
   end
 
   describe "#execute" do
