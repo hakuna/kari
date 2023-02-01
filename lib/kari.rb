@@ -30,9 +30,9 @@ module Kari
 
       old_tenant = current_tenant
       self.current_tenant = tenant
-      value = block.call
+      block.call
+    ensure
       self.current_tenant = old_tenant
-      value
     end
 
     def switch!(tenant)

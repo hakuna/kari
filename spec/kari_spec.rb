@@ -58,6 +58,20 @@ RSpec.describe Kari do
 
       specify { expect { subject.call }.to raise_error(described_class::SchemaNotFound) }
     end
+
+    context "encountering exception in block" do
+      let(:block) do
+        lambda do
+          raise ActiveRecord::RecordNotFound
+        end
+      end
+
+      it "ensures previous tenant is reset" do
+        described_class.switch!("prev_tenant")
+        expect { subject.call }.to raise_error(ActiveRecord::RecordNotFound)
+        expect(described_class.current_tenant).to eq "prev_tenant"
+      end
+    end
   end
 
   describe "#switch!" do
