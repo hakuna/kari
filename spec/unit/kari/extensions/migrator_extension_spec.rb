@@ -26,16 +26,4 @@ RSpec.describe Kari::Extensions::MigratorExtension do
       expect(connections.uniq.count).to eq(1)
     end
   end
-
-  describe "#generate_migrator_advisory_lock_id" do
-    it "creates a unique lock id for each tenant schema" do
-      allow(Kari).to receive(:current_tenant).and_return("acme")
-      lock_id1 = migrator.generate_migrator_advisory_lock_id
-
-      allow(Kari).to receive(:current_tenant).and_return("umbrella-corp")
-      lock_id2 = migrator.generate_migrator_advisory_lock_id
-
-      expect(lock_id1).not_to eq(lock_id2)
-    end
-  end
 end

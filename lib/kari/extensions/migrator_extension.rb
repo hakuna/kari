@@ -23,12 +23,6 @@ module Kari
         self.class.advisory_lock_connection_pool.with_connection { |connection| yield(connection) }
       end
 
-      # Locking on tenant-specific schema improves migration speed quite a bit
-      # plus it makes parallel migrations of tenants possible (in theory)
-      def generate_migrator_advisory_lock_id
-        super + Zlib.crc32(Kari.current_tenant)
-      end
-
     end
 
   end

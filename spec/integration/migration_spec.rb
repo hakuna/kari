@@ -37,22 +37,4 @@ RSpec.describe "improved migration performance" do
 
     expect(num_pools_created).to eq(1)
   end
-
-  it "improves performance by including tenant for advisory_lock_id (locking down tenant schema)" do
-    lock_ids = []
-
-    allow_any_instance_of(ActiveRecord::ConnectionAdapters::PostgreSQLAdapter)
-      .to receive(:get_advisory_lock).and_wrap_original do |method, lock_id|
-
-      lock_ids << lock_id
-      method.call(lock_id)
-    end
-
-    [nil, "acme", "acme", "umbrella-corp"].each do |tenant|
-      Kari.switch! tenant
-      ActiveRecord::Migrator.new(:up, [], @schema_migration).migrate
-    end
-
-    expect(lock_ids.uniq.count).to eq 3
-  end
 end
