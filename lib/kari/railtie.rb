@@ -2,6 +2,7 @@
 
 require_relative "extensions/postgresql_adapter_extension"
 require_relative "extensions/future_result_extension"
+require_relative "extensions/migrator_extension"
 require_relative "extensions/active_job_extension"
 
 require "active_record/connection_adapters/postgresql_adapter"
@@ -17,7 +18,7 @@ module Kari
 
     config.to_prepare do
       ActiveRecord::ConnectionAdapters::PostgreSQLAdapter.prepend(Kari::Extensions::PostgreSQLAdapterExtension)
-
+      ActiveRecord::Migrator.prepend(Kari::Extensions::MigratorExtension)
       ActiveRecord::FutureResult.prepend(Kari::Extensions::FutureResultExtension) if Rails::VERSION::MAJOR >= 7
 
       ActiveJob::Base.prepend(Kari::Extensions::ActiveJobExtension) if defined?(ActiveJob::Base)
