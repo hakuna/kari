@@ -9,11 +9,11 @@ module Kari
       prepended do
         def self.advisory_lock_connection_pool
           # ActiveSupport::IsolatedExecutionState is only available in Rails 7+
-          state = defined?(ActiveSupport::IsolatedExecutionState) ? ActiveSupport::IsolatedExecutionState : Thread.current
+          state = defined?(ActiveSupport::IsolatedExecutionState) ?
+            ActiveSupport::IsolatedExecutionState : Thread.current
 
-          state[:advisory_lock_connection_pool] ||= ActiveRecord::ConnectionAdapters::ConnectionHandler.new.establish_connection(
-            ActiveRecord::Base.connection_db_config
-          )
+          state[:advisory_lock_connection_pool] ||= ActiveRecord::ConnectionAdapters::ConnectionHandler
+            .new.establish_connection(ActiveRecord::Base.connection_db_config)
         end
       end
 

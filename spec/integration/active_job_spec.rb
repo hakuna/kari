@@ -41,7 +41,7 @@ RSpec.describe "active job support" do
     HelloWorldJob.perform_later
     Kari.drop("temp")
 
-    expect(Rails.logger).to receive(:error).with('World not found!')
+    expect(Rails.logger).to receive(:error).with("World not found!")
     expect { perform_enqueued_jobs }.not_to raise_error
   end
 end

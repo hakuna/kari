@@ -258,11 +258,23 @@ RSpec.describe Kari do
 
   describe "extensions" do
     it "loaded extension for schema switching in postgresql connection adapter" do
-      expect(ActiveRecord::ConnectionAdapters::PostgreSQLAdapter).to include(Kari::Extensions::PostgreSQLAdapterExtension)
+      expect(ActiveRecord::ConnectionAdapters::PostgreSQLAdapter)
+        .to include(Kari::Extensions::PostgreSQLAdapterExtension)
+    end
+
+    it "loaded extension for faster migrations switching in migrator" do
+      expect(ActiveRecord::Migrator)
+        .to include(Kari::Extensions::MigratorExtension)
     end
 
     it "loaded extension for load_async tenant support through FutureResultExtension", if: Rails::VERSION::MAJOR >= 7 do
-      expect(ActiveRecord::FutureResult).to include(Kari::Extensions::FutureResultExtension)
+      expect(ActiveRecord::FutureResult)
+        .to include(Kari::Extensions::FutureResultExtension)
+    end
+
+    it "loaded extension for tenant switching in ActiveJob" do
+      expect(ActiveJob::Base)
+        .to include(Kari::Extensions::ActiveJobExtension)
     end
   end
 end
