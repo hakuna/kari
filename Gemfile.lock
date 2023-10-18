@@ -3,7 +3,7 @@ PATH
   specs:
     kari (0.1.0)
       pg (~> 1.2)
-      rails (>= 6.1, < 7.1)
+      rails (>= 6.1, < 7.2)
 
 GEM
   remote: https://rubygems.org/
