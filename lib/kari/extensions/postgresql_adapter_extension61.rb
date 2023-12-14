@@ -2,7 +2,7 @@
 
 module Kari
   module Extensions
-    module PostgreSQLAdapterExtension
+    module PostgreSQLAdapterExtension61
       def cache_sql(*args)
         ensure_correct_schema_search_path!
         super

@@ -2,7 +2,7 @@
 
 require "spec_helper"
 
-RSpec.describe "improved migration performance" do
+RSpec.describe "improved migration performance", if: Rails::VERSION::STRING < "7.1" do
   before do
     self.use_transactional_tests = false
 

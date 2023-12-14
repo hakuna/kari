@@ -2,9 +2,9 @@
 
 require "spec_helper"
 
-RSpec.describe Kari::Extensions::PostgreSQLAdapterExtension do
+RSpec.describe Kari::Extensions::PostgreSQLAdapterExtension61 do
   class MyAdapter
-    prepend Kari::Extensions::PostgreSQLAdapterExtension
+    prepend Kari::Extensions::PostgreSQLAdapterExtension61
 
     attr_accessor :schema_search_path
     attr_reader :query_cache_cleared_at
@@ -40,7 +40,7 @@ RSpec.describe Kari::Extensions::PostgreSQLAdapterExtension do
 
   shared_examples "not changing schema search path" do |search_path|
     specify do
-      expect(connection).not_to receive(:clear_query_cache) 
+      expect(connection).not_to receive(:clear_query_cache)
       expect { subject.call }.not_to change(connection, :schema_search_path).from(search_path)
     end
   end

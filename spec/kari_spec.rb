@@ -257,22 +257,32 @@ RSpec.describe Kari do
   end
 
   describe "extensions" do
-    it "loaded extension for schema switching in postgresql connection adapter" do
+    it "supports schema switching (7.0 and earlier)", if: Rails::VERSION::STRING <= "7.0" do
       expect(ActiveRecord::ConnectionAdapters::PostgreSQLAdapter)
-        .to include(Kari::Extensions::PostgreSQLAdapterExtension)
+        .to include(Kari::Extensions::PostgreSQLAdapterExtension61)
     end
 
-    it "loaded extension for faster migrations switching in migrator" do
+    it "supports schema switching (7.1 and later)", if: Rails::VERSION::STRING >= "7.1" do
+      expect(ActiveRecord::ConnectionAdapters::PostgreSQLAdapter)
+        .to include(Kari::Extensions::PostgreSQLAdapterExtension71)
+    end
+
+    it "supports faster migrations (7.0 and earlier)", if: Rails::VERSION::STRING <= "7.0" do
       expect(ActiveRecord::Migrator)
         .to include(Kari::Extensions::MigratorExtension)
     end
 
-    it "loaded extension for load_async tenant support through FutureResultExtension", if: Rails::VERSION::MAJOR >= 7 do
+    it "supports load_async (7.0 and later)", if: Rails::VERSION::STRING >= "7.0" do
       expect(ActiveRecord::FutureResult)
         .to include(Kari::Extensions::FutureResultExtension)
     end
 
-    it "loaded extension for tenant switching in ActiveJob" do
+    it "supports exclusion of tenant schemas", if: Rails::VERSION::STRING >= "7.1" do
+      expect(ActiveRecord::ConnectionAdapters::PostgreSQL::SchemaDumper)
+        .to include(Kari::Extensions::SchemaDumper)
+    end
+
+    it "supports ActiveJob" do
       expect(ActiveJob::Base)
         .to include(Kari::Extensions::ActiveJobExtension)
     end
