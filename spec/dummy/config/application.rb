@@ -21,7 +21,7 @@ module Dummy
 
     config.middleware.use Kari::Elevators::Subdomain
 
-    config.active_record.async_query_executor = :global_thread_pool if Rails::VERSION::MAJOR >= 7
+    config.active_record.async_query_executor = :global_thread_pool if Rails::VERSION::STRING >= "7.0"
 
     # Configuration for the application, engines, and railties goes here.
     #

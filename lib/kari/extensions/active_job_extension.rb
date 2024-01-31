@@ -14,7 +14,7 @@ module Kari
       end
 
       def perform_now
-        if @__tenant 
+        if @__tenant
           Kari.process(@__tenant) { super }
         else
           super

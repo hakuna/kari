@@ -2,7 +2,7 @@
 
 require "spec_helper"
 
-RSpec.describe "load_async support (Rails 7.0+)", if: Rails::VERSION::MAJOR >= 7 do
+RSpec.describe "load_async support (Rails 7.0+)", if: Rails::VERSION::STRING >= "7.0" do
   before do
     self.use_transactional_tests = false
 

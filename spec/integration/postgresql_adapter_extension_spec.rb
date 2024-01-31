@@ -39,13 +39,38 @@ RSpec.describe "Postgresql adapter extension integration" do
   describe "#exec_query" do
     specify do
       Kari.switch! "tenant1"
+      result = connection.exec_query("SELECT * FROM posts", "SQL", [], prepare: false)
+      expect(result.rows.count).to eq 2
 
+      Kari.switch! "tenant2"
       result = connection.exec_query("SELECT * FROM posts", "SQL", [], prepare: false)
-      expect(result.rows.count).to eq 2
-      result = connection.exec_query("SELECT * FROM posts", "SQL", [], prepare: false, tenant: "tenant2")
       expect(result.rows.count).to eq 1
-      result = connection.exec_query("SELECT * FROM posts", "SQL", [], prepare: false)
-      expect(result.rows.count).to eq 2
+    end
+
+    describe "support for tenant: keyword (future result)" do
+      context "Rails < 7.1", if: Rails::VERSION::STRING < "7.1" do
+        specify do
+          Kari.switch! "tenant1"
+          result = connection.exec_query("SELECT * FROM posts", "SQL", [], prepare: false)
+          expect(result.rows.count).to eq 2
+          result = connection.exec_query("SELECT * FROM posts", "SQL", [], prepare: false, tenant: "tenant2")
+          expect(result.rows.count).to eq 1
+          result = connection.exec_query("SELECT * FROM posts", "SQL", [], prepare: false)
+          expect(result.rows.count).to eq 2
+        end
+      end
+
+      context "Rails >= 7.1", if: Rails::VERSION::STRING >= "7.1" do
+        specify do
+          Kari.switch! "tenant1"
+          result = connection.internal_exec_query("SELECT * FROM posts", "SQL", [], prepare: false)
+          expect(result.rows.count).to eq 2
+          result = connection.internal_exec_query("SELECT * FROM posts", "SQL", [], prepare: false, tenant: "tenant2")
+          expect(result.rows.count).to eq 1
+          result = connection.internal_exec_query("SELECT * FROM posts", "SQL", [], prepare: false)
+          expect(result.rows.count).to eq 2
+        end
+      end
     end
   end
 

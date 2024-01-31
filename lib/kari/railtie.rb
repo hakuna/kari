@@ -1,8 +1,11 @@
 # frozen_string_literal: true
 
-require_relative "extensions/postgresql_adapter_extension"
+require_relative "extensions/postgresql_adapter_extension61"
+require_relative "extensions/postgresql_adapter_extension71"
+
 require_relative "extensions/future_result_extension"
 require_relative "extensions/migrator_extension"
+require_relative "extensions/schema_dumper"
 require_relative "extensions/active_job_extension"
 
 require "active_record/connection_adapters/postgresql_adapter"
@@ -17,9 +20,23 @@ module Kari
     config.kari.seed_after_create = false
 
     config.to_prepare do
-      ActiveRecord::ConnectionAdapters::PostgreSQLAdapter.prepend(Kari::Extensions::PostgreSQLAdapterExtension)
-      ActiveRecord::Migrator.prepend(Kari::Extensions::MigratorExtension)
-      ActiveRecord::FutureResult.prepend(Kari::Extensions::FutureResultExtension) if Rails::VERSION::MAJOR >= 7
+      if Rails::VERSION::STRING >= "7.1"
+        ActiveRecord::ConnectionAdapters::PostgreSQLAdapter.prepend(Kari::Extensions::PostgreSQLAdapterExtension71)
+      else
+        ActiveRecord::ConnectionAdapters::PostgreSQLAdapter.prepend(Kari::Extensions::PostgreSQLAdapterExtension61)
+      end
+
+      if Rails::VERSION::STRING < "7.1"
+        ActiveRecord::Migrator.prepend(Kari::Extensions::MigratorExtension)
+      end
+
+      if Rails::VERSION::STRING >= "7.0"
+        ActiveRecord::FutureResult.prepend(Kari::Extensions::FutureResultExtension)
+      end
+
+      if Rails::VERSION::STRING >= "7.1"
+        ActiveRecord::ConnectionAdapters::PostgreSQL::SchemaDumper.prepend(Kari::Extensions::SchemaDumper)
+      end
 
       ActiveJob::Base.prepend(Kari::Extensions::ActiveJobExtension) if defined?(ActiveJob::Base)
 
