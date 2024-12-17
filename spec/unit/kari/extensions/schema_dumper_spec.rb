@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "spec_helper"
+require "ostruct"
 
 RSpec.describe Kari::Extensions::SchemaDumper do
   class MySchemaDumper
