@@ -32,9 +32,9 @@ Gem::Specification.new do |spec|
   spec.add_dependency "pg", "~> 1.2"
   spec.add_dependency "rails", ">= 6.1", "< 8.0"
 
-  spec.add_development_dependency "appraisal", "~> 2.4"
+  spec.add_development_dependency "appraisal", "~> 2.5"
   spec.add_development_dependency "rake", "~> 13.0"
-  spec.add_development_dependency "rspec-rails", "~> 4.0"
+  spec.add_development_dependency "rspec-rails", "~> 7.0"
   spec.add_development_dependency "rubocop", "~> 1.21"
   spec.add_development_dependency "rubocop-rails", "~> 2.16"
   spec.add_development_dependency "rubocop-rspec", "~> 2.13"
